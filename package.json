@@ -33,14 +33,13 @@
     "mdast-lint": "~1.1.1",
     "mock-fs": "3.12.1",
     "tslint": "~3.7.4",
-    "typescript": "1.7.5",
+    "typescript": "^1.7.5",
     "typings": "1.0.4"
   },
   "typings": "lib/index.d.ts",
   "dependencies": {
     "browserify": "10.2.4",
-    "fs-readdir-recursive": "0.1.2",
-    "npm": "3.3.5"
+    "fs-readdir-recursive": "0.1.2"
   },
   "repository": {
     "type": "git",
