@@ -73,7 +73,7 @@ export class PromisedNpm {
 			exec("npm ls --json --production" + (silent ? " --silent" : ""), (err: any, stdout: string, stderr: string) => {
 				if (err) {
 					if (stderr.indexOf("extraneous") !== -1) {
-						this._logger.error("Extraneous module found in node_modules. You must install modules Using akashic-cli.");
+						this._logger.error("Extraneous module found in node_modules. You must install modules using akashic-cli.");
 					}
 					return reject(err);
 				}
