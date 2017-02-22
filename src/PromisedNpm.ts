@@ -6,8 +6,8 @@ export interface PromisedNpmParameterObject {
 	logger?: Logger;
 }
 
-export interface NpmLsRsultObject {
-	dependencies?: {[key: string]: NpmLsRsultObject};
+export interface NpmLsResultObject {
+	dependencies?: {[key: string]: NpmLsResultObject};
 }
 
 export class PromisedNpm {
@@ -67,10 +67,10 @@ export class PromisedNpm {
 		});
 	}
 
-	ls(silent: boolean = false): Promise<NpmLsRsultObject> {
-		return new Promise<NpmLsRsultObject>((resolve, reject) => {
+	ls(silent: boolean = false): Promise<NpmLsResultObject> {
+		return new Promise<NpmLsResultObject>((resolve, reject) => {
 			this._logger.info("Listing dependencies ...");
-			exec("npm ls --json --production --silent", (err: any, stdout: string, stderr: string) => {
+			exec("npm ls --json --production" + (silent ? " --silent" : ""), (err: any, stdout: string, stderr: string) => {
 				if (err) {
 					if (stderr.indexOf("extraneous") !== -1) {
 						this._logger.error("Extraneous module found in node_modules. You must install modules Using akashic-cli.");
@@ -86,7 +86,7 @@ export class PromisedNpm {
 	update(moduleNames: string[] = []): Promise<void> {
 		return new Promise<void>((resolve, reject) => {
 			this._logger.info("Update dependencies ...");
-			exec("npm uninstall " + moduleNames.join(" "), (err: any) => {
+			exec("npm update " + moduleNames.join(" "), (err: any) => {
 				err ? reject(err) : resolve();
 			});
 		});
