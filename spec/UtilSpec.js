@@ -83,7 +83,6 @@ describe("Util", function () {
 			expect(path.resolve(process.cwd())).toBe(resolvedOriginalPath);
 			var restoreDirectory = Util.chdir("./testdir1/insidedir");
 			expect(path.resolve(process.cwd())).toBe(resolvedInsideDirPath);
-			done();
 
 			var pathlog = [];
 			Promise.resolve()
