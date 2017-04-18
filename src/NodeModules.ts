@@ -48,10 +48,25 @@ export module NodeModules {
 		return new Promise<string[]>((resolve, reject) => {
 			var filePaths: string[] = [];
 			b.on("dep", (row: any) => {
+				// console.log("row: " + row.file, Object.keys(row));
 				if (row.file === dummyRootName)
 					return;
+
+				const rawFilePath = Util.makeUnixPath(row.file);
+				// const ignorefilePath = Util.makeUnixPath("akashic-cli-commons/node_modules/process/browser.js");
+				const ignoreModulePaths = [
+					"akashic-cli-commons/node_modules/"
+					].map((modulePath) => Util.makeUnixPath(modulePath));
+				// console.log(rawFilePath, ignorefilePath);
+				// if (rawFilePath.includes(ignorefilePath)) return;
+				if (ignoreModulePaths.find((modulePath) => rawFilePath.includes(modulePath))) {
+					return;
+				}
+
 				var filePath = Util.makeUnixPath(path.relative(basepath, row.file));
 				if (/^\.\.\//.test(filePath)) {
+					console.log("[BAD]", filePath);
+					//return ;
 					var msg = "Unsupported module found in " + JSON.stringify(modules)
 												+ ". Skipped to listing '" + filePath
 												+ "' that cannot be dealt with. (This may be a core module of Node.js)";
@@ -61,6 +76,7 @@ export module NodeModules {
 				filePaths.push(filePath);
 			});
 			b.bundle((err: any) => {
+				console.log("bundle err", !!err);
 				err ? reject(err) : resolve(filePaths);
 			});
 		});
