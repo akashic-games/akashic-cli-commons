@@ -38,6 +38,12 @@ export module NodeModules {
 		var rootRequirer = moduleNames.map((name: string) => {
 			return "require(\"" + Util.makeModuleNameNoVer(name) + "\");";
 		}).join("\n");
+
+		// akashicコンテンツが 間接的に Node.js のコアモジュールを参照するモジュールに依存している場合、
+		// akashic-cli-commons/node_modules 以下への依存として表現される。
+		// これを検知した場合、そのモジュールへの依存はgame.jsonに追記せず、akashicコマンドユーザには警告を表示する。
+		const ignoreModulePaths = ["akashic-cli-commons/node_modules/"];
+
 		var b = browserify({
 			entries: new StringStream(rootRequirer, dummyRootName),
 			basedir: basepath,
@@ -51,14 +57,15 @@ export module NodeModules {
 				if (row.file === dummyRootName)
 					return;
 
-				const rawFilePath = Util.makeUnixPath(row.file);
-				const ignoreModulePaths = [
-					"akashic-cli-commons/node_modules/process/"
-					].map((modulePath) => Util.makeUnixPath(modulePath));
-				if (ignoreModulePaths.find((modulePath) => rawFilePath.includes(modulePath))) return;
-
 				var filePath = Util.makeUnixPath(path.relative(basepath, row.file));
 				if (/^\.\.\//.test(filePath)) {
+					const rawFilePath = Util.makeUnixPath(row.file);
+					if (ignoreModulePaths.find((modulePath) => rawFilePath.includes(modulePath))) {
+						const msg = "Dependence on " + filePath
+							+ " is detected. Akashic content should not depend on core module of Node.js. This content may not work properly.";
+						console.warn(msg);
+						return;
+					}
 					var msg = "Unsupported module found in " + JSON.stringify(modules)
 												+ ". Skipped to listing '" + filePath
 												+ "' that cannot be dealt with. (This may be a core module of Node.js)";
