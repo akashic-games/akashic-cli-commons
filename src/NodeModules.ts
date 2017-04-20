@@ -2,13 +2,16 @@ import * as fs from "fs";
 import * as path from "path";
 import * as browserify from "browserify";
 import * as Util from "./Util";
+import { Logger } from "./Logger";
+import { ConsoleLogger } from "./ConsoleLogger";
 import { StringStream } from "./StringStream";
 
 export module NodeModules {
-	export function listModuleFiles(basepath: string, modules: string|string[]): Promise<string[]> {
+	export function listModuleFiles(basepath: string, modules: string|string[], logger?: Logger): Promise<string[]> {
+		const _logger = logger || new ConsoleLogger();
 		if (modules.length === 0) return Promise.resolve([]);
 		return Promise.resolve()
-			.then(() => NodeModules._listScriptFiles(basepath, modules))
+			.then(() => NodeModules._listScriptFiles(basepath, modules, _logger))
 			.then((paths) => paths.concat(NodeModules._listPackageJsonsFromScriptsPath(basepath, paths)));
 	}
 
@@ -28,7 +31,7 @@ export module NodeModules {
 		return packageJsonPaths;
 	}
 
-	export function _listScriptFiles(basepath: string, modules: string|string[]): Promise<string[]> {
+	export function _listScriptFiles(basepath: string, modules: string|string[], logger: Logger): Promise<string[]> {
 		var moduleNames = (typeof modules === "string") ? [modules] : modules;
 
 		// moduleNamesをrequireするだけのソースコード文字列を作って依存性解析の基点にする
@@ -39,10 +42,10 @@ export module NodeModules {
 			return "require(\"" + Util.makeModuleNameNoVer(name) + "\");";
 		}).join("\n");
 
-		// akashicコンテンツが 間接的に Node.js のコアモジュールを参照するモジュールに依存している場合、
+		// akashicコンテンツが Node.js のコアモジュールを参照するモジュールに依存している場合、
 		// akashic-cli-commons/node_modules 以下への依存として表現される。
 		// これを検知した場合、そのモジュールへの依存はgame.jsonに追記せず、akashicコマンドユーザには警告を表示する。
-		const ignoreModulePaths = ["akashic-cli-commons/node_modules/"];
+		const ignoreModulePaths = ["/akashic-cli-commons/node_modules/"];
 
 		var b = browserify({
 			entries: new StringStream(rootRequirer, dummyRootName),
@@ -61,9 +64,13 @@ export module NodeModules {
 				if (/^\.\.\//.test(filePath)) {
 					const rawFilePath = Util.makeUnixPath(row.file);
 					if (ignoreModulePaths.find((modulePath) => rawFilePath.includes(modulePath))) {
-						const msg = "Dependence on " + filePath
-							+ " is detected. Akashic content should not depend on core module of Node.js. This content may not work properly.";
-						console.warn(msg);
+						const detectedModuleName = path.basename(path.dirname(filePath));
+
+						const msg = "Reference to '" + detectedModuleName
+							+ "' is detected, and Skipped to listing."
+							+ " Akashic content should not depend on core module of Node.js."
+							+ " Game Developers should build your game without reference to '" + detectedModuleName + "'.";
+						logger.warn(msg);
 						return;
 					}
 					var msg = "Unsupported module found in " + JSON.stringify(modules)
