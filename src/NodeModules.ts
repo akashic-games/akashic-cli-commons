@@ -13,12 +13,18 @@ export module NodeModules {
 	}
 
 	export function _listPackageJsonsFromScriptsPath(basepath: string, filepaths: string[]): string[] {
-		// パッケージのルートパスを取得する。filePathsにはrequireするモジュールのファイルパスが渡されるため、必ずnode_modules以下のパスが得られる
-		var packageDirPaths: string[] =	filepaths.map((path) => /(.*node_modules\/(?:@.*?\/)?(?:.*?)\/)/.exec(path)[1]);
-		packageDirPaths = packageDirPaths.filter((path, i, self) => self.indexOf(path) === i);
+		var packageDirPaths: string[] =	filepaths.map((path) => {
+			var m = /(.*node_modules\/(?:@.*?\/)?(?:.*?)\/)/.exec(path);
+			return m && m[1];
+		});
 
 		var packageJsonPaths: string[] = [];
+		var alreadyProcessed: { [path: string]: boolean } = {};
 		packageDirPaths.forEach((dirPath: string) => {
+			if (!dirPath || alreadyProcessed[dirPath])
+				return;
+			alreadyProcessed[dirPath] = true;
+
 			var packageJsonPath = Util.makeUnixPath(path.join(basepath, dirPath, "package.json"));
 			try {
 				if (!fs.lstatSync(packageJsonPath).isFile()) return;
@@ -32,8 +38,8 @@ export module NodeModules {
 		var moduleNames = (typeof modules === "string") ? [modules] : modules;
 
 		// moduleNamesをrequireするだけのソースコード文字列を作って依存性解析の基点にする
-		// (moduleNamesを直接b.require()してもよいはずだが、
-		//  そうすると名前(ディレクトリ名であることが多い)が出力されてしまうので避ける)
+		// (moduleNamesを直接b.require()してもよいはずだが、そうするとモジュールのエントリポイントの代わりに
+		// モジュールの名前(ディレクトリ名であることが多い)が出力されてしまうので避ける)
 		var dummyRootName = path.join(basepath, "__akashic-cli_dummy_require_root.js");
 		var rootRequirer = moduleNames.map((name: string) => {
 			return "require(\"" + Util.makeModuleNameNoVer(name) + "\");";
@@ -48,9 +54,10 @@ export module NodeModules {
 		return new Promise<string[]>((resolve, reject) => {
 			var filePaths: string[] = [];
 			b.on("dep", (row: any) => {
-				if (row.file === dummyRootName)
-					return;
 				var filePath = Util.makeUnixPath(path.relative(basepath, row.file));
+				if (!(/^(?:\.\/)?node_modules/.test(filePath))) {
+					return;
+				}
 				if (/^\.\.\//.test(filePath)) {
 					var msg = "Unsupported module found in " + JSON.stringify(modules)
 												+ ". Skipped to listing '" + filePath

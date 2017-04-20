@@ -45,6 +45,7 @@ export interface GameConfiguration {
 	width: number;
 	height: number;
 	fps?: number;
+	main?: string;
 	audio?: {[key: string]: AudioSystemConfiguration};
 	assets?: Assets;
 	globalScripts?: string[];
