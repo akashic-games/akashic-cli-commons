@@ -7,11 +7,10 @@ import { ConsoleLogger } from "./ConsoleLogger";
 import { StringStream } from "./StringStream";
 
 export module NodeModules {
-	export function listModuleFiles(basepath: string, modules: string|string[], logger?: Logger): Promise<string[]> {
-		const _logger = logger || new ConsoleLogger();
+	export function listModuleFiles(basepath: string, modules: string|string[], logger: Logger = new ConsoleLogger()): Promise<string[]> {
 		if (modules.length === 0) return Promise.resolve([]);
 		return Promise.resolve()
-			.then(() => NodeModules._listScriptFiles(basepath, modules, _logger))
+			.then(() => NodeModules._listScriptFiles(basepath, modules, logger))
 			.then((paths) => paths.concat(NodeModules._listPackageJsonsFromScriptsPath(basepath, paths)));
 	}
 
@@ -67,9 +66,9 @@ export module NodeModules {
 						const detectedModuleName = path.basename(path.dirname(filePath));
 
 						const msg = "Reference to '" + detectedModuleName
-							+ "' is detected, and Skipped to listing."
-							+ " Akashic content should not depend on core module of Node.js."
-							+ " Game Developers should build your game runnable without reference to '" + detectedModuleName + "'.";
+							+ "' is detected and skipped to listing."
+							+ " Akashic content cannot depend on core modules of Node.js."
+							+ " You should build your game runnable without '" + detectedModuleName + "'.";
 						logger.warn(msg);
 						return;
 					}
