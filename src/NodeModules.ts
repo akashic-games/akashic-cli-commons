@@ -66,14 +66,14 @@ export module NodeModules {
 						const detectedModuleName = path.basename(path.dirname(filePath));
 
 						const msg = "Reference to '" + detectedModuleName
-							+ "' is detected and skipped to listing."
+							+ "' is detected and skipped listing."
 							+ " Akashic content cannot depend on core modules of Node.js."
 							+ " You should build your game runnable without '" + detectedModuleName + "'.";
 						logger.warn(msg);
 						return;
 					}
 					var msg = "Unsupported module found in " + JSON.stringify(modules)
-												+ ". Skipped to listing '" + filePath
+												+ ". Skipped listing '" + filePath
 												+ "' that cannot be dealt with. (This may be a core module of Node.js)";
 					reject(new Error(msg));
 					return;
