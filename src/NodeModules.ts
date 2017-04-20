@@ -23,7 +23,7 @@ export module NodeModules {
 		var packageJsonPaths: string[] = [];
 		var alreadyProcessed: { [path: string]: boolean } = {};
 		packageDirPaths.forEach((dirPath: string) => {
-			if (!dirPath || alreadyProcessed[dirPath])
+			if (alreadyProcessed[dirPath])
 				return;
 			alreadyProcessed[dirPath] = true;
 
