@@ -15,14 +15,13 @@ export module NodeModules {
 	}
 
 	export function _listPackageJsonsFromScriptsPath(basepath: string, filepaths: string[]): string[] {
-		var packageDirPaths: string[] =	filepaths.map((path) => {
-			var m = /(.*node_modules\/(?:@.*?\/)?(?:.*?)\/)/.exec(path);
-			return m && m[1];
-		});
-
 		var packageJsonPaths: string[] = [];
 		var alreadyProcessed: { [path: string]: boolean } = {};
-		packageDirPaths.forEach((dirPath: string) => {
+		filepaths.forEach((filepath: string) => {
+			var m = /(.*node_modules\/(?:@.*?\/)?(?:.*?)\/)/.exec(filepath);
+			if (!m)
+				return;
+			var dirPath = m[1];
 			if (alreadyProcessed[dirPath])
 				return;
 			alreadyProcessed[dirPath] = true;
