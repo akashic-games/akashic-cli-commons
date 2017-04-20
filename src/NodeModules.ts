@@ -69,7 +69,7 @@ export module NodeModules {
 						const msg = "Reference to '" + detectedModuleName
 							+ "' is detected, and Skipped to listing."
 							+ " Akashic content should not depend on core module of Node.js."
-							+ " Game Developers should build your game without reference to '" + detectedModuleName + "'.";
+							+ " Game Developers should build your game runnable without reference to '" + detectedModuleName + "'.";
 						logger.warn(msg);
 						return;
 					}
