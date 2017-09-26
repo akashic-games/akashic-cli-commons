@@ -50,4 +50,10 @@ export interface GameConfiguration {
 	assets?: Assets;
 	globalScripts?: string[];
 	operationPlugins?: OperationPluginDeclaration[];
+	environment?: ModuleEnvironment;
+}
+
+
+export interface ModuleEnvironment {
+	"sandbox-runtime"?: string;
 }
