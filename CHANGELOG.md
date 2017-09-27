@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.2.2
+
+* game.json に environment メンバを追加
+
 ## 0.2.1
 * `NodeModules#listModuleFiles()` がモジュール名だけでなくファイル名を受け付けられるように
 * `NodeModules#listModuleFiles()` がコアモジュールを検出した時、エラーでなく警告するように
