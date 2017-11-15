@@ -10,11 +10,11 @@ export module NodeModules {
 	export function listModuleFiles(basepath: string, modules: string|string[], logger: Logger = new ConsoleLogger()): Promise<string[]> {
 		if (modules.length === 0) return Promise.resolve([]);
 		return Promise.resolve()
-			.then(() => NodeModules._listScriptFiles(basepath, modules, logger))
-			.then((paths) => paths.concat(NodeModules._listPackageJsonsFromScriptsPath(basepath, paths)));
+			.then(() => NodeModules.listScriptFiles(basepath, modules, logger))
+			.then((paths) => paths.concat(NodeModules.listPackageJsonsFromScriptsPath(basepath, paths)));
 	}
 
-	export function _listPackageJsonsFromScriptsPath(basepath: string, filepaths: string[]): string[] {
+	export function listPackageJsonsFromScriptsPath(basepath: string, filepaths: string[]): string[] {
 		var packageJsonPaths: string[] = [];
 		var alreadyProcessed: { [path: string]: boolean } = {};
 		filepaths.forEach((filepath: string) => {
@@ -35,7 +35,7 @@ export module NodeModules {
 		return packageJsonPaths;
 	}
 
-	export function _listScriptFiles(basepath: string, modules: string|string[], logger: Logger): Promise<string[]> {
+	export function listScriptFiles(basepath: string, modules: string|string[], logger: Logger): Promise<string[]> {
 		var moduleNames = (typeof modules === "string") ? [modules] : modules;
 
 		// moduleNamesをrequireするだけのソースコード文字列を作って依存性解析の基点にする

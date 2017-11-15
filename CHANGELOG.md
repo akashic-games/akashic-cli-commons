@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.2.3
+* `NodeModules#_listPackageJsonsFromScriptsPath()` を `NodeModules#listPackageJsonsFromScriptsPath()` に変更
+* `NodeModules#_listScriptFiles()` を `NodeModules#listScriptFiles()` に変更
+
 ## 0.2.2
 
 * game.json に environment メンバを追加
