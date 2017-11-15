@@ -3,6 +3,7 @@
 ## 0.2.3
 * `NodeModules#_listPackageJsonsFromScriptsPath()` を `NodeModules#listPackageJsonsFromScriptsPath()` に変更
 * `NodeModules#_listScriptFiles()` を `NodeModules#listScriptFiles()` に変更
+* `GameConfiguration#ModuleMainScripts` を追加
 
 ## 0.2.2
 
