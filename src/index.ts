@@ -10,8 +10,10 @@ import { ConfigurationFile } from "./ConfigurationFile";
 export { ConfigurationFile };
 import { Configuration, ConfigurationParameterObject } from "./Configuration";
 export { Configuration, ConfigurationParameterObject };
-import { AssetConfiguration, AudioSystemConfiguration, Assets, OperationPluginDeclaration, GameConfiguration } from "./GameConfiguration";
-export { AssetConfiguration, AudioSystemConfiguration, Assets, OperationPluginDeclaration, GameConfiguration };
+import {
+	AssetConfiguration, AudioSystemConfiguration, Assets, OperationPluginDeclaration, GameConfiguration, ModuleMainScripts
+} from "./GameConfiguration";
+export { AssetConfiguration, AudioSystemConfiguration, Assets, OperationPluginDeclaration, GameConfiguration, ModuleMainScripts };
 /* tslint:disable */  // tslintがUtilをunused variableとして誤検出するので無効化
 import * as Util from "./Util";
 export { Util };
