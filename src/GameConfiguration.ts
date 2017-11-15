@@ -38,6 +38,8 @@ export interface OperationPluginDeclaration {
 	option?: any;
 }
 
+export type ModuleMainScripts = { [path: string]: string };
+
 /**
  * game.json の型。
  */
@@ -51,6 +53,7 @@ export interface GameConfiguration {
 	globalScripts?: string[];
 	operationPlugins?: OperationPluginDeclaration[];
 	environment?: ModuleEnvironment;
+	moduleMainScripts?: ModuleMainScripts;
 }
 
 
