@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.2.5
+* version 0.2.4 が正しくパブリッシュ出来ていなかったのを修正
+
 ## 0.2.4
 * `NodeModules#listModuleMainScripts()` を追加
 
