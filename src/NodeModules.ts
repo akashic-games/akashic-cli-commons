@@ -5,6 +5,7 @@ import * as Util from "./Util";
 import { Logger } from "./Logger";
 import { ConsoleLogger } from "./ConsoleLogger";
 import { StringStream } from "./StringStream";
+import { ModuleMainScripts } from "./index";
 
 export module NodeModules {
 	export function listModuleFiles(basepath: string, modules: string|string[], logger: Logger = new ConsoleLogger()): Promise<string[]> {
@@ -33,6 +34,28 @@ export module NodeModules {
 			} catch (e) { /* nothing */ }
 		});
 		return packageJsonPaths;
+	}
+
+	export function listModuleMainScripts(packageJsonFiles: string[]): ModuleMainScripts {
+		var moduleMainScripts: ModuleMainScripts = {};
+
+		for (var i = 0; i < packageJsonFiles.length; i++) {
+			var packageJsonFile = packageJsonFiles[i];
+			var packageJsonData = fs.readFileSync(packageJsonFile, "utf-8");
+			var mainScript: string;
+			var moduleName: string;
+			try {
+				var d = JSON.parse(packageJsonData);
+				mainScript = path.join(path.dirname(packageJsonFile), d.main);
+				moduleName = d.name;
+			} catch (e) {
+				// do nothing
+			}
+			if (moduleName && moduleName !== "" && mainScript && mainScript !== "") {
+				moduleMainScripts[moduleName] = Util.makeUnixPath(mainScript);
+			}
+		}
+		return moduleMainScripts;
 	}
 
 	export function listScriptFiles(basepath: string, modules: string|string[], logger: Logger): Promise<string[]> {
