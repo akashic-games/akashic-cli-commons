@@ -37,6 +37,7 @@ export module NodeModules {
 	}
 
 	export function listModuleMainScripts(packageJsonFiles: string[]): ModuleMainScripts {
+		if (packageJsonFiles.length === 0) return {};
 		var moduleMainScripts: ModuleMainScripts = {};
 
 		for (var i = 0; i < packageJsonFiles.length; i++) {
@@ -59,6 +60,7 @@ export module NodeModules {
 	}
 
 	export function listScriptFiles(basepath: string, modules: string|string[], logger: Logger): Promise<string[]> {
+		if (modules.length === 0) return Promise.resolve([]);
 		var moduleNames = (typeof modules === "string") ? [modules] : modules;
 
 		// moduleNamesをrequireするだけのソースコード文字列を作って依存性解析の基点にする
