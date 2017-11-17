@@ -118,6 +118,24 @@ describe("NodeModules", function () {
 		});
 	});
 
+	describe(".listModuleMainScripts()", function () {
+		it("list the files named package.json", function (done) {
+			mockfs(mockFsContent);
+			Promise.resolve()
+				.then(() => NodeModules.listScriptFiles(".", ["dummy", "dummy2"]))
+				.then((filePaths) => NodeModules.listPackageJsonsFromScriptsPath(".", filePaths))
+				.then((packageJsonFiles) => NodeModules.listModuleMainScripts(packageJsonFiles))
+				.then((moduleMainScripts) => {
+					expect(moduleMainScripts).toEqual({
+						"dummy": "node_modules/dummy/main.js",
+						"dummyChild": "node_modules/dummy/node_modules/dummyChild/main.js"
+					});
+				})
+				.then(done)
+				.catch(() => done.fail());
+		});
+	});
+
 	// モジュール名に node_modules を含むモジュールに依存しているケース
 	describe(".listPackageJsonsFromScriptsPath() with failure-prone module name", function () {
 		it("list the files named package.json", function (done) {

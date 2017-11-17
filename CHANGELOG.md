@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.2.4
+* `NodeModules#listModuleMainScripts()` を追加
+
 ## 0.2.3
 * `NodeModules#_listPackageJsonsFromScriptsPath()` を `NodeModules#listPackageJsonsFromScriptsPath()` に変更
 * `NodeModules#_listScriptFiles()` を `NodeModules#listScriptFiles()` に変更
