@@ -1,7 +1,9 @@
 import * as fs from "fs";
+import * as path from "path";
 import { Logger } from "./Logger";
 import { ConsoleLogger } from "./ConsoleLogger";
 import { GameConfiguration } from "./GameConfiguration";
+import { Util } from "./index";
 
 export interface ConfigurationParameterObject {
 	content: GameConfiguration;
@@ -34,5 +36,25 @@ export class Configuration {
 			}
 			return true;
 		});
+	}
+
+	/**
+	 * アセットのファイル名をファイルパスに基づいてハッシュ化し、アセットファイル名をリネームしたうえで game.json に反映する
+	 * @param hashLength ハッシュ化後のファイル名の文字数の最大値。省略された場合、20文字
+	 * @param dest 出力先のgamejsonが置かれているパス
+	 */
+	hashingAssetNames(hashLength: number = 20, dest: string): void {
+		var assetNames = Object.keys(this._content.assets);
+		assetNames.forEach((name) => {
+			var filePath = this._content.assets[name].path;
+
+			const hashedFilePath = Util.hashingBasenameInPath(filePath, hashLength);
+			this._content.assets[name].path = hashedFilePath;
+			this._content.assets[name].virtualPath = filePath;
+			fs.renameSync(path.resolve(dest, filePath), path.resolve(dest, hashedFilePath));
+		});
+		if (this._content.main) {
+			this._content.main = Util.hashingBasenameInPath(this._content.main, hashLength);
+		}
 	}
 }

@@ -39,7 +39,8 @@
   "typings": "lib/index.d.ts",
   "dependencies": {
     "browserify": "10.2.4",
-    "fs-readdir-recursive": "0.1.2"
+    "fs-readdir-recursive": "0.1.2",
+    "js-sha256": "^0.8.0"
   },
   "repository": {
     "type": "git",

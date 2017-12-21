@@ -1,3 +1,6 @@
+import * as path from "path";
+import {sha256} from "js-sha256";
+
 export function invertMap(obj: {[key: string]: string}): {[key: string]: string[]};
 export function invertMap(obj: {[key: string]: Object}, prop: string): {[key: string]: string[]};
 export function invertMap(obj: {[key: string]: any}, prop?: string): {[key: string]: string[]} {
@@ -44,4 +47,24 @@ export function chdir(dirpath: string): (err?: any) => Promise<void> {
 		process.chdir(cwd);
 		return err ? Promise.reject(err) : Promise.resolve();
 	};
+}
+
+/**
+ * 文字列を sha256 でハッシュ化する。
+ * @param str 変換する文字列
+ */
+export function hashing(str: string): string {
+	return sha256(str);
+}
+
+/**
+ * 与えられたファイルパスのハッシュをファイル名に置き換えたファイルパスを返す。
+ * @param filepath 変換するファイルパス
+ * @param nameLength ファイル名の文字数の最大値
+ */
+export function hashingBasenameInPath(filepath: string, nameLength: number): string {
+	const dirname = path.dirname(filepath);
+	const hashedFilename = sha256(filepath).slice(0, nameLength);
+	const extname = path.extname(filepath);
+	return path.join(dirname, hashedFilename + extname);
 }
