@@ -39,22 +39,53 @@ export class Configuration {
 	}
 
 	/**
-	 * アセットのファイル名をファイルパスに基づいてハッシュ化し、アセットファイル名をリネームしたうえで game.json に反映する
-	 * @param hashLength ハッシュ化後のファイル名の文字数の最大値。省略された場合、20文字
-	 * @param dest 出力先のgamejsonが置かれているパス
+	 * アセット・globalScriptsのファイル名をファイルパスに基づいてハッシュ化し、アセットファイル名をリネームしたうえで game.json に反映する
+	 * @param basedir 出力先のgamejsonが置かれているパス
+	 * @param maxHashLength ハッシュ化後のファイル名の文字数の最大値。省略された場合、20文字
 	 */
-	hashingAssetNames(hashLength: number = 20, dest: string): void {
+	hashFilePaths(basedir: string, maxHashLength: number = 20): void {
 		var assetNames = Object.keys(this._content.assets);
 		assetNames.forEach((name) => {
 			var filePath = this._content.assets[name].path;
 
-			const hashedFilePath = Util.hashingBasenameInPath(filePath, hashLength);
+			const hashedFilePath = Util.hashBasename(filePath, maxHashLength);
 			this._content.assets[name].path = hashedFilePath;
 			this._content.assets[name].virtualPath = filePath;
-			fs.renameSync(path.resolve(dest, filePath), path.resolve(dest, hashedFilePath));
+
+			this._renameFilename(basedir, filePath, hashedFilePath);
 		});
 		if (this._content.main) {
-			this._content.main = Util.hashingBasenameInPath(this._content.main, hashLength);
+			this._content.main = Util.hashBasename(this._content.main, maxHashLength);
 		}
+		if (this._content.operationPlugins) {
+			this._content.operationPlugins.forEach((name, idx) => {
+				var filePath = this._content.operationPlugins[idx].script;
+				const hashedFilePath = Util.hashBasename(this._content.operationPlugins[idx].script, maxHashLength);
+				this._content.operationPlugins[idx].script = hashedFilePath;
+
+				this._renameFilename(basedir, filePath, hashedFilePath);
+			});
+		}
+		if (this._content.globalScripts) {
+			this._content.globalScripts.forEach((name, idx) => {
+				console.log("name", name);
+				const assetname = "a_e_z_" + idx;
+				const hashedFilePath = Util.hashBasename(name, maxHashLength);
+				// あとで衝突判定する
+				this._content.assets[assetname] = {
+					type: /\.json$/i.test(name) ? "text" : "script",
+					virtualPath: name,
+					path: hashedFilePath,
+					global: true
+				};
+				this._renameFilename(basedir, name, hashedFilePath);
+			});
+		}
+		this._content.globalScripts = [];
+	}
+
+	_renameFilename(basedir: string, filePath: string, hashedFilePath: string) {
+		if (fs.accessSync(path.resolve(basedir, hashedFilePath))) throw new Error(hashedFilePath + " is already exists. Use other hash-filename param.");
+		fs.renameSync(path.resolve(basedir, filePath), path.resolve(basedir, hashedFilePath));
 	}
 }

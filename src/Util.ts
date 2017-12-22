@@ -50,19 +50,11 @@ export function chdir(dirpath: string): (err?: any) => Promise<void> {
 }
 
 /**
- * 文字列を sha256 でハッシュ化する。
- * @param str 変換する文字列
- */
-export function hashing(str: string): string {
-	return sha256(str);
-}
-
-/**
- * 与えられたファイルパスのハッシュをファイル名に置き換えたファイルパスを返す。
+ * 与えられたファイルパスのファイル名部分を、ファイルパスかた計算したハッシュ値で置き換えたファイルパスを返す。
  * @param filepath 変換するファイルパス
  * @param nameLength ファイル名の文字数の最大値
  */
-export function hashingBasenameInPath(filepath: string, nameLength: number): string {
+export function hashBasename(filepath: string, nameLength: number): string {
 	const dirname = path.dirname(filepath);
 	const hashedFilename = sha256(filepath).slice(0, nameLength);
 	const extname = path.extname(filepath);
