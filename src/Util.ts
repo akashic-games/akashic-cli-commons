@@ -1,5 +1,7 @@
 import * as path from "path";
-import {sha256} from "js-sha256";
+import * as fs from "fs";
+import { sha256 } from "js-sha256";
+import { GameConfiguration, OperationPluginDeclaration } from "./GameConfiguration";
 
 export function invertMap(obj: {[key: string]: string}): {[key: string]: string[]};
 export function invertMap(obj: {[key: string]: Object}, prop: string): {[key: string]: string[]};
@@ -55,8 +57,94 @@ export function chdir(dirpath: string): (err?: any) => Promise<void> {
  * @param nameLength ファイル名の文字数の最大値
  */
 export function hashBasename(filepath: string, nameLength: number): string {
-	const dirname = path.dirname(filepath);
+	const dirname = path.posix.dirname(filepath);
 	const hashedFilename = sha256(filepath).slice(0, nameLength);
 	const extname = path.extname(filepath);
-	return path.join(dirname, hashedFilename + extname);
+	return path.posix.join(dirname, hashedFilename + extname);
+}
+
+/**
+ * アセット・ globalScripts のファイル名をファイルパスに基づいてハッシュ化し、アセットファイル名をリネームする
+ * @param basedir 読み込んだ gamejson が置かれているパス
+ * @param maxHashLength ハッシュ化後のファイル名の文字数の最大値。省略された場合、20文字
+ */
+export function renameAssetFilenames(content: GameConfiguration, basedir: string, maxHashLength: number = 20): void {
+	_renameAssets(content, basedir, maxHashLength);
+	_reanmeMain(content, basedir, maxHashLength);
+	_reanmeOperationPlugins(content, basedir, maxHashLength);
+	_renameGlobalScripts(content, basedir, maxHashLength);
+	_reanmeModuleMainScripts(content, basedir, maxHashLength);
+}
+
+function _renameFilename(basedir: string, filePath: string, hashedFilePath: string) {
+	try {
+		fs.accessSync(path.posix.resolve(basedir, hashedFilePath));
+	} catch (error) {
+		if (error.code === "ENOENT") {
+			fs.renameSync(path.posix.resolve(basedir, filePath), path.posix.resolve(basedir, hashedFilePath));
+			return;
+		}
+		throw error;
+	}
+	throw new Error(hashedFilePath + " is already exists. Use other hash-filename param.");
+}
+
+function _renameAssets(content: GameConfiguration, basedir: string, maxHashLength: number) {
+	var assetNames = Object.keys(content.assets);
+	assetNames.forEach((name) => {
+		var filePath = content.assets[name].path;
+
+		const hashedFilePath = hashBasename(filePath, maxHashLength);
+		content.assets[name].path = hashedFilePath;
+		content.assets[name].virtualPath = filePath;
+
+		_renameFilename(basedir, filePath, hashedFilePath);
+	});
+}
+
+function _reanmeMain(content: GameConfiguration, basedir: string, maxHashLength: number) {
+	if (content.main) {
+		const mainPath = content.main;
+		content.main = hashBasename(content.main, maxHashLength);
+		_renameFilename(basedir, mainPath, content.main);
+	}
+}
+
+function _reanmeOperationPlugins(content: GameConfiguration, basedir: string, maxHashLength: number) {
+	if (content.operationPlugins) {
+		content.operationPlugins.forEach((plugin: OperationPluginDeclaration, idx: number) => {
+			var filePath = plugin.script;
+			const hashedFilePath = hashBasename(content.operationPlugins[idx].script, maxHashLength);
+			content.operationPlugins[idx].script = hashedFilePath;
+
+			_renameFilename(basedir, filePath, hashedFilePath);
+		});
+	}
+}
+
+function _renameGlobalScripts(content: GameConfiguration, basedir: string, maxHashLength: number) {
+	if (content.globalScripts) {
+		content.globalScripts.forEach((name: string, idx: number) => {
+			const assetname = "a_e_z_" + idx;
+			const hashedFilePath = hashBasename(name, maxHashLength);
+			// あとで衝突判定する
+			content.assets[assetname] = {
+				type: /\.json$/i.test(name) ? "text" : "script",
+				virtualPath: name,
+				path: hashedFilePath,
+				global: true
+			};
+			_renameFilename(basedir, name, hashedFilePath);
+		});
+	}
+	content.globalScripts = [];
+}
+
+function _reanmeModuleMainScripts(content: GameConfiguration, basedir: string, maxHashLength: number) {
+	if (content.moduleMainScripts) {
+		Object.keys(content.moduleMainScripts).forEach((name: string, idx: number) => {
+			content.moduleMainScripts[name] = hashBasename(content.moduleMainScripts[name], maxHashLength);
+			// moduleMainScripts は globalScripts として登録されているためリネーム処理はしない
+		});
+	}
 }
