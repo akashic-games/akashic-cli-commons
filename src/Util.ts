@@ -52,7 +52,7 @@ export function chdir(dirpath: string): (err?: any) => Promise<void> {
 }
 
 /**
- * 与えられたファイルパスのファイル名部分を、ファイルパスかた計算したハッシュ値で置き換えたファイルパスを返す。
+ * 与えられたファイルパスのファイル名部分を、ファイルパスから計算したハッシュ値で置き換えたファイルパスを返す。
  * @param filepath 変換するファイルパス
  * @param nameLength ファイル名の文字数の最大値
  */
@@ -65,7 +65,8 @@ export function hashBasename(filepath: string, nameLength: number): string {
 
 /**
  * アセット・ globalScripts のファイル名をファイルパスに基づいてハッシュ化し、アセットファイル名をリネームする
- * @param basedir 読み込んだ gamejson が置かれているパス
+ * @param content 読み込む game.json
+ * @param basedir 読み込む gamejson が置かれているパス
  * @param maxHashLength ハッシュ化後のファイル名の文字数の最大値。省略された場合、20文字
  */
 export function renameAssetFilenames(content: GameConfiguration, basedir: string, maxHashLength: number = 20): void {
@@ -142,7 +143,7 @@ function _renameGlobalScripts(content: GameConfiguration, basedir: string, maxHa
 
 function _reanmeModuleMainScripts(content: GameConfiguration, basedir: string, maxHashLength: number) {
 	if (content.moduleMainScripts) {
-		Object.keys(content.moduleMainScripts).forEach((name: string, idx: number) => {
+		Object.keys(content.moduleMainScripts).forEach((name: string) => {
 			content.moduleMainScripts[name] = hashBasename(content.moduleMainScripts[name], maxHashLength);
 			// moduleMainScripts は globalScripts として登録されているためリネーム処理はしない
 		});

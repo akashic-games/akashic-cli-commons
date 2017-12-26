@@ -171,14 +171,14 @@ describe("Util", function () {
 				expect(gamejson.main).toBe("script/04ef22b752657e08b66f.js");
 				expect(gamejson.assets["hoge"]).toEqual({
 					type: "image",
-					path: Util.hashBasename("image/hoge.png", 20),
+					path: "image/a70844aefe0a5ceb64eb.png",
 					virtualPath: "image/hoge.png",
 					global: true
 				});
 				// globalScripts は scriptAsset に変換される
 				expect(gamejson.assets["a_e_z_0"]).toEqual({
 					type: "script",
-					path: Util.hashBasename("node_modules/foo/bar/index.js", 20),
+					path: "node_modules/foo/bar/825a514c9ba0f7565c0b.js",
 					virtualPath: "node_modules/foo/bar/index.js",
 					global: true
 				});
