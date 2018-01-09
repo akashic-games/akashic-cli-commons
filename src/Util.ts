@@ -82,7 +82,7 @@ function _renameFilename(basedir: string, filePath: string, hashedFilePath: stri
 		fs.accessSync(path.posix.resolve(basedir, hashedFilePath));
 	} catch (error) {
 		if (error.code === "ENOENT") {
-			fs.renameSync(path.posix.resolve(basedir, filePath), path.posix.resolve(basedir, hashedFilePath));
+			fs.renameSync(path.resolve(basedir, filePath), path.resolve(basedir, hashedFilePath));
 			return;
 		}
 		throw error;
