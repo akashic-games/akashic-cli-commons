@@ -71,15 +71,15 @@ export function hashBasename(filepath: string, nameLength: number): string {
  */
 export function renameAssetFilenames(content: GameConfiguration, basedir: string, maxHashLength: number = 20): void {
 	_renameAssets(content, basedir, maxHashLength);
-	_reanmeMain(content, basedir, maxHashLength);
-	_reanmeOperationPlugins(content, basedir, maxHashLength);
+	_renameMain(content, basedir, maxHashLength);
+	_renameOperationPlugins(content, basedir, maxHashLength);
 	_renameGlobalScripts(content, basedir, maxHashLength);
-	_reanmeModuleMainScripts(content, basedir, maxHashLength);
+	_renameModuleMainScripts(content, basedir, maxHashLength);
 }
 
 function _renameFilename(basedir: string, filePath: string, hashedFilePath: string) {
 	try {
-		fs.accessSync(path.posix.resolve(basedir, hashedFilePath));
+		fs.accessSync(path.resolve(basedir, hashedFilePath));
 	} catch (error) {
 		if (error.code === "ENOENT") {
 			fs.renameSync(path.resolve(basedir, filePath), path.resolve(basedir, hashedFilePath));
@@ -103,7 +103,7 @@ function _renameAssets(content: GameConfiguration, basedir: string, maxHashLengt
 	});
 }
 
-function _reanmeMain(content: GameConfiguration, basedir: string, maxHashLength: number) {
+function _renameMain(content: GameConfiguration, basedir: string, maxHashLength: number) {
 	if (content.main) {
 		const mainPath = content.main;
 		content.main = hashBasename(content.main, maxHashLength);
@@ -111,7 +111,7 @@ function _reanmeMain(content: GameConfiguration, basedir: string, maxHashLength:
 	}
 }
 
-function _reanmeOperationPlugins(content: GameConfiguration, basedir: string, maxHashLength: number) {
+function _renameOperationPlugins(content: GameConfiguration, basedir: string, maxHashLength: number) {
 	if (content.operationPlugins) {
 		content.operationPlugins.forEach((plugin: OperationPluginDeclaration, idx: number) => {
 			var filePath = plugin.script;
@@ -141,7 +141,7 @@ function _renameGlobalScripts(content: GameConfiguration, basedir: string, maxHa
 	content.globalScripts = [];
 }
 
-function _reanmeModuleMainScripts(content: GameConfiguration, basedir: string, maxHashLength: number) {
+function _renameModuleMainScripts(content: GameConfiguration, basedir: string, maxHashLength: number) {
 	if (content.moduleMainScripts) {
 		Object.keys(content.moduleMainScripts).forEach((name: string) => {
 			content.moduleMainScripts[name] = hashBasename(content.moduleMainScripts[name], maxHashLength);
