@@ -190,5 +190,28 @@ describe("Util", function () {
 			})
 			.catch(done.fail)
 		});
+
+		it("hash game.json - throw error", function (done) {
+			Promise.resolve()
+			.then(() => ConfigurationFile.ConfigurationFile.read(path.join("./srcDir", "game.json"), undefined))
+			.then((gamejson) => {
+				gamejson.assets = {
+					hoge: {
+						type: "image",
+						path: "image/hoge.png",
+						global: true
+					},
+					hoge2: {
+						type: "image",
+						path: "image/hoge.png",
+						global: true
+					}
+				};
+				gamejson.globalScripts = [];
+				expect(() => {Util.renameAssetFilenames(gamejson, "./srcDir")}).toThrow(new Error("Use other hash-filename param."));
+				done();
+			})
+			.catch(done.fail)
+		});
 	});
 });
