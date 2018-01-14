@@ -91,6 +91,7 @@ describe("Renamer", function () {
 			.catch(done.fail)
 		});
 
+		// アセットの path が重複している場合、ファイル名の衝突が発生しエラーになる
 		it("hash game.json - throw error", function (done) {
 			Promise.resolve()
 			.then(() => ConfigurationFile.ConfigurationFile.read(path.join("./srcDir", "game.json"), undefined))
