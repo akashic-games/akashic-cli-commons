@@ -109,10 +109,10 @@ describe("Renamer", function () {
 					}
 				};
 				gamejson.globalScripts = [];
-				expect(() => {Renamer.renameAssetFilenames(gamejson, "./srcDir")}).toThrow(new Error("Use other hash-filename param."));
+				expect(() => {Renamer.renameAssetFilenames(gamejson, "./srcDir")}).toThrow(new Error(Renamer.ERROR_FILENAME_CONFLICT));
 				done();
 			})
-			.catch(done.fail)
+			.catch(done.fail);
 		});
 	});
 });
