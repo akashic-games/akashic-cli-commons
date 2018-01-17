@@ -24,15 +24,11 @@ export function hashBasename(filepath: string, nameLength: number): string {
  * @param maxHashLength ハッシュ化後のファイル名の文字数の最大値。省略された場合、20文字
  */
 export function renameAssetFilenames(content: GameConfiguration, basedir: string, maxHashLength: number = 20): void {
-	try {
-		_renameAssets(content, basedir, maxHashLength);
-		_renameMain(content, basedir, maxHashLength);
-		_renameOperationPlugins(content, basedir, maxHashLength);
-		_renameGlobalScripts(content, basedir, maxHashLength);
-		_renameModuleMainScripts(content, basedir, maxHashLength);
-	} catch (error) {
-		throw error;
-	}
+	_renameAssets(content, basedir, maxHashLength);
+	_renameMain(content, basedir, maxHashLength);
+	_renameOperationPlugins(content, basedir, maxHashLength);
+	_renameGlobalScripts(content, basedir, maxHashLength);
+	_renameModuleMainScripts(content, basedir, maxHashLength);
 }
 
 /**
@@ -55,10 +51,9 @@ function _renameFilename(basedir: string, filePath: string, newFilePath: string)
 }
 
 function _renameAssets(content: GameConfiguration, basedir: string, maxHashLength: number): void {
-	var assetNames = Object.keys(content.assets);
+	const assetNames = Object.keys(content.assets);
 	assetNames.forEach((name) => {
-		var filePath = content.assets[name].path;
-
+		const filePath = content.assets[name].path;
 		const hashedFilePath = hashBasename(filePath, maxHashLength);
 		content.assets[name].path = hashedFilePath;
 		content.assets[name].virtualPath = filePath;
@@ -77,7 +72,7 @@ function _renameMain(content: GameConfiguration, basedir: string, maxHashLength:
 function _renameOperationPlugins(content: GameConfiguration, basedir: string, maxHashLength: number): void {
 	if (content.operationPlugins) {
 		content.operationPlugins.forEach((plugin: OperationPluginDeclaration, idx: number) => {
-			var filePath = plugin.script;
+			const filePath = plugin.script;
 			const hashedFilePath = hashBasename(content.operationPlugins[idx].script, maxHashLength);
 			content.operationPlugins[idx].script = hashedFilePath;
 
