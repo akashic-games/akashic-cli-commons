@@ -6,6 +6,10 @@ var ConfigurationFile = require("../lib/ConfigurationFile");
 var GameConfiguration = require("../lib/GameConfiguration");
 
 describe("Util", function () {
+	afterEach(() => {
+		mockfs.restore();
+	});
+
 	it(".filterMap()", function () {
 		var arr = [1, 3, 100, -5, "foo", false, "zoo", 4];
 		expect(Util.filterMap(arr, (v) => (typeof v === "string" ? v.toUpperCase() : undefined))).toEqual(["FOO", "ZOO"]);
@@ -65,6 +69,47 @@ describe("Util", function () {
 			expect(reversed.id1).toEqual(["foo"]);
 			expect(reversed.id100).toEqual(["bar"]);
 			expect(reversed.id42).toEqual(["zoo"]);
+		});
+	});
+
+	describe("mkdirpSync", () => {
+		it("creates directory", () => {
+			mockfs({});
+			expect(() => fs.statSync("./test/some/dir")).toThrow();
+			Util.mkdirpSync("./test/some/dir");
+			expect(fs.statSync("./test/some/dir").isDirectory()).toBe(true);
+		});
+
+		it("does nothing if exists", () => {
+			mockfs({
+				"test": {
+					"some": {
+						"dir": {},
+						"anotherDir": {}
+					}
+				}
+			});
+			expect(fs.statSync("./test/some/dir").isDirectory()).toBe(true);
+			Util.mkdirpSync("./test/some/dir");
+			expect(fs.statSync("./test/some/dir").isDirectory()).toBe(true);
+		});
+
+		it("throws if it is a file", () => {
+			mockfs({
+				"test": {
+					"some": {
+						"dir": "a file"
+					}
+				}
+			});
+			expect(() => Util.mkdirpSync("./test/some/dir")).toThrow();
+		});
+
+		it("throws when it finds a file in a path", () => {
+			mockfs({
+				"test": "a file"
+			});
+			expect(() => Util.mkdirpSync("./test/some/dir")).toThrow();
 		});
 	});
 });
