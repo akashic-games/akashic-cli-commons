@@ -26,7 +26,6 @@ export function hashBasename(filepath: string, nameLength: number): string {
 export function renameAssetFilenames(content: GameConfiguration, basedir: string, maxHashLength: number = 20): void {
 	_renameAssets(content, basedir, maxHashLength);
 	_renameMain(content, basedir, maxHashLength);
-	// _renameOperationPlugins(content, basedir, maxHashLength);
 	_renameGlobalScripts(content, basedir, maxHashLength);
 	_renameModuleMainScripts(content, basedir, maxHashLength);
 }
