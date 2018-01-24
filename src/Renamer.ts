@@ -1,7 +1,7 @@
 import * as path from "path";
 import * as fs from "fs";
 import { sha256 } from "js-sha256";
-import { GameConfiguration, OperationPluginDeclaration } from "./GameConfiguration";
+import { GameConfiguration } from "./GameConfiguration";
 
 export const ERROR_FILENAME_CONFLICT = "ERROR_FILENAME_CONFLICT";
 
@@ -26,7 +26,7 @@ export function hashBasename(filepath: string, nameLength: number): string {
 export function renameAssetFilenames(content: GameConfiguration, basedir: string, maxHashLength: number = 20): void {
 	_renameAssets(content, basedir, maxHashLength);
 	_renameMain(content, basedir, maxHashLength);
-	_renameOperationPlugins(content, basedir, maxHashLength);
+	// _renameOperationPlugins(content, basedir, maxHashLength);
 	_renameGlobalScripts(content, basedir, maxHashLength);
 	_renameModuleMainScripts(content, basedir, maxHashLength);
 }
@@ -66,18 +66,6 @@ function _renameMain(content: GameConfiguration, basedir: string, maxHashLength:
 		const mainPath = content.main;
 		content.main = hashBasename(content.main, maxHashLength);
 		_renameFilename(basedir, mainPath, content.main);
-	}
-}
-
-function _renameOperationPlugins(content: GameConfiguration, basedir: string, maxHashLength: number): void {
-	if (content.operationPlugins) {
-		content.operationPlugins.forEach((plugin: OperationPluginDeclaration, idx: number) => {
-			const filePath = plugin.script;
-			const hashedFilePath = hashBasename(content.operationPlugins[idx].script, maxHashLength);
-			content.operationPlugins[idx].script = hashedFilePath;
-
-			_renameFilename(basedir, filePath, hashedFilePath);
-		});
 	}
 }
 
