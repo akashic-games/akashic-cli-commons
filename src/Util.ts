@@ -1,3 +1,6 @@
+import * as fs from "fs";
+import * as path from "path";
+
 export function invertMap(obj: {[key: string]: string}): {[key: string]: string[]};
 export function invertMap(obj: {[key: string]: Object}, prop: string): {[key: string]: string[]};
 export function invertMap(obj: {[key: string]: any}, prop?: string): {[key: string]: string[]} {
@@ -45,3 +48,24 @@ export function chdir(dirpath: string): (err?: any) => Promise<void> {
 		return err ? Promise.reject(err) : Promise.resolve();
 	};
 }
+
+export function mkdirpSync(p: string): void {
+	p = path.resolve(p);
+	try {
+		fs.mkdirSync(p);
+	} catch (e) {
+		if (e.code === "ENOENT") {
+			mkdirpSync(path.dirname(p));
+			mkdirpSync(p);
+		} else {
+			var stat: any;
+			try {
+				stat = fs.statSync(p);
+			} catch (e1) {
+				throw e;
+			}
+			if (!stat.isDirectory())
+				throw e;
+		}
+	}
+};

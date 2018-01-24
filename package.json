@@ -1,6 +1,6 @@
 {
   "name": "@akashic/akashic-cli-commons",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "The shared definitions and routines for akashic-cli-xxx",
   "main": "lib/index.js",
   "scripts": {
@@ -39,7 +39,8 @@
   "typings": "lib/index.d.ts",
   "dependencies": {
     "browserify": "10.2.4",
-    "fs-readdir-recursive": "0.1.2"
+    "fs-readdir-recursive": "0.1.2",
+    "js-sha256": "^0.8.0"
   },
   "repository": {
     "type": "git",

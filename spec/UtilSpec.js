@@ -1,8 +1,15 @@
 var path = require("path");
 var mockfs = require("mock-fs");
+var fs = require("fs");
 var Util = require("../lib/Util");
+var ConfigurationFile = require("../lib/ConfigurationFile");
+var GameConfiguration = require("../lib/GameConfiguration");
 
 describe("Util", function () {
+	afterEach(() => {
+		mockfs.restore();
+	});
+
 	it(".filterMap()", function () {
 		var arr = [1, 3, 100, -5, "foo", false, "zoo", 4];
 		expect(Util.filterMap(arr, (v) => (typeof v === "string" ? v.toUpperCase() : undefined))).toEqual(["FOO", "ZOO"]);
@@ -65,42 +72,44 @@ describe("Util", function () {
 		});
 	});
 
-	describe(".chdir()", function () {
-		afterEach(function () {
-			mockfs.restore();
+	describe("mkdirpSync", () => {
+		it("creates directory", () => {
+			mockfs({});
+			expect(() => fs.statSync("./test/some/dir")).toThrow();
+			Util.mkdirpSync("./test/some/dir");
+			expect(fs.statSync("./test/some/dir").isDirectory()).toBe(true);
 		});
 
-		it("changes and restores the cwd", function (done) {
+		it("does nothing if exists", () => {
 			mockfs({
-				testdir1: {
-					insidedir: {}
-				},
-				testdir2: {
+				"test": {
+					"some": {
+						"dir": {},
+						"anotherDir": {}
+					}
 				}
 			});
-			var resolvedOriginalPath = path.resolve(".");
-			var resolvedInsideDirPath = path.resolve("./testdir1/insidedir");
-			expect(path.resolve(process.cwd())).toBe(resolvedOriginalPath);
-			var restoreDirectory = Util.chdir("./testdir1/insidedir");
-			expect(path.resolve(process.cwd())).toBe(resolvedInsideDirPath);
+			expect(fs.statSync("./test/some/dir").isDirectory()).toBe(true);
+			Util.mkdirpSync("./test/some/dir");
+			expect(fs.statSync("./test/some/dir").isDirectory()).toBe(true);
+		});
 
-			var pathlog = [];
-			Promise.resolve()
-				.then(() => restoreDirectory())
-				.then(() => {
-					pathlog.push(1);
-					expect(path.resolve(process.cwd())).toBe(resolvedOriginalPath);
-				})
-				.then(() => restoreDirectory("error"))
-				.catch((e) => {
-					pathlog.push(2);
-					expect(e).toBe("error");
-				})
-				.then(() => {
-					expect(pathlog).toEqual([1, 2]);
-					done();
-				})
-				.catch(done.fail);
+		it("throws if it is a file", () => {
+			mockfs({
+				"test": {
+					"some": {
+						"dir": "a file"
+					}
+				}
+			});
+			expect(() => Util.mkdirpSync("./test/some/dir")).toThrow();
+		});
+
+		it("throws when it finds a file in a path", () => {
+			mockfs({
+				"test": "a file"
+			});
+			expect(() => Util.mkdirpSync("./test/some/dir")).toThrow();
 		});
 	});
 });

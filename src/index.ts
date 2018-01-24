@@ -17,3 +17,5 @@ export { AssetConfiguration, AudioSystemConfiguration, Assets, OperationPluginDe
 /* tslint:disable */  // tslintがUtilをunused variableとして誤検出するので無効化
 import * as Util from "./Util";
 export { Util };
+import * as Renamer from "./Renamer";
+export { Renamer };

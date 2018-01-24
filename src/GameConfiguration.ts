@@ -5,6 +5,7 @@
 export interface AssetConfiguration {
 	type: string;
 	path: string;
+	virtualPath?: string;
 	width?: number;
 	height?: number;
 	systemId?: string;
