@@ -41,12 +41,7 @@ function _renameFilename(basedir: string, filePath: string, newFilePath: string)
 		fs.accessSync(path.resolve(basedir, newFilePath));
 	} catch (error) {
 		if (error.code === "ENOENT") {
-			try {
-				fs.renameSync(path.resolve(basedir, filePath), path.resolve(basedir, newFilePath));
-			} catch (e) {
-				console.log("ERRRRRRR", basedir, filePath, newFilePath);
-				throw e;
-			}
+			fs.renameSync(path.resolve(basedir, filePath), path.resolve(basedir, newFilePath));
 			return;
 		}
 		throw error;
