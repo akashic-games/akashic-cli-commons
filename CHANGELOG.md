@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.2.7
+* `Renamer#renameAssetFilenames()` がオーディオアセットを正常に変換できない問題を解決
+
 ## 0.2.6
 * `Renamer` を追加
 
