@@ -32,6 +32,11 @@ describe("Renamer", function () {
 								type: "image",
 								path: "image/hoge.png",
 								global: true
+							},
+							foo: {
+								type: "audio",
+								path: "audio/foo",
+								global: true
 							}
 						},
 						globalScripts: [
@@ -46,6 +51,10 @@ describe("Renamer", function () {
 					},
 					image: {
 						"hoge.png": ""
+					},
+					audio: {
+						"foo.mp4": "",
+						"foo.ogg": "",
 					},
 					node_modules: {
 						foo: {
@@ -75,6 +84,12 @@ describe("Renamer", function () {
 					virtualPath: "image/hoge.png",
 					global: true
 				});
+				expect(gamejson.assets["foo"]).toEqual({
+					type: "audio",
+					path: "audio/47acba638f0bcfc681d7",
+					virtualPath: "audio/foo",
+					global: true
+				});
 				// globalScripts は scriptAsset に変換される
 				expect(gamejson.assets["a_e_z_0"]).toEqual({
 					type: "script",
@@ -82,9 +97,12 @@ describe("Renamer", function () {
 					virtualPath: "node_modules/foo/bar/index.js",
 					global: true
 				});
+
 				expect(gamejson.moduleMainScripts["foo"]).toBe(Renamer.hashBasename("node_modules/foo/bar/index.js", 20));
 				expect(fs.statSync(path.join("srcDir", "image/a70844aefe0a5ceb64eb.png")).isFile()).toBe(true);
 				expect(fs.statSync(path.join("srcDir", "script/04ef22b752657e08b66f.js")).isFile()).toBe(true);
+				expect(fs.statSync(path.join("srcDir", "audio/47acba638f0bcfc681d7.mp4")).isFile()).toBe(true);
+				expect(fs.statSync(path.join("srcDir", "audio/47acba638f0bcfc681d7.ogg")).isFile()).toBe(true);
 				expect(fs.statSync(path.join("srcDir", "node_modules/foo/bar/825a514c9ba0f7565c0b.js")).isFile()).toBe(true);
 				done();
 			})

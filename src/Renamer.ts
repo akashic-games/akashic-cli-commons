@@ -41,12 +41,30 @@ function _renameFilename(basedir: string, filePath: string, newFilePath: string)
 		fs.accessSync(path.resolve(basedir, newFilePath));
 	} catch (error) {
 		if (error.code === "ENOENT") {
-			fs.renameSync(path.resolve(basedir, filePath), path.resolve(basedir, newFilePath));
+			try {
+				fs.renameSync(path.resolve(basedir, filePath), path.resolve(basedir, newFilePath));
+			} catch (e) {
+				console.log("ERRRRRRR", basedir, filePath, newFilePath);
+				throw e;
+			}
 			return;
 		}
 		throw error;
 	}
 	throw new Error(ERROR_FILENAME_CONFLICT);
+}
+
+function _renameAudioFilename(basedir: string, filePath: string, newFilePath: string): void {
+	const extTypes = [".ogg", ".aac", ".mp4"];
+	extTypes.forEach((ext) => {
+		try {
+			fs.accessSync(path.resolve(basedir, filePath + ext));
+			_renameFilename(basedir, filePath + ext, newFilePath + ext);
+		} catch (error) {
+			if (error.code === "ENOENT") return; // 全てのオーディオ拡張子が揃っているとは限らない
+			throw error;
+		}
+	});
 }
 
 function _renameAssets(content: GameConfiguration, basedir: string, maxHashLength: number): void {
@@ -56,7 +74,11 @@ function _renameAssets(content: GameConfiguration, basedir: string, maxHashLengt
 		const hashedFilePath = hashBasename(filePath, maxHashLength);
 		content.assets[name].path = hashedFilePath;
 		content.assets[name].virtualPath = filePath;
-		_renameFilename(basedir, filePath, hashedFilePath);
+		if (content.assets[name].type !== "audio") {
+			_renameFilename(basedir, filePath, hashedFilePath);
+		} else {
+			_renameAudioFilename(basedir, filePath, hashedFilePath);
+		}
 	});
 }
 
