@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.2.8
+* game.json のハッシュ化処理が誤っていた問題を修正
+
 ## 0.2.7
 * `Renamer#renameAssetFilenames()` がオーディオアセットを正常に変換できない問題を解決
 
