@@ -26,8 +26,13 @@ describe("Renamer", function () {
 			mockfs({
 				srcDir: {
 					"game.json": JSON.stringify({
-						main: "script/mainScene.js",					
+						main: "./script/mainScene",
 						assets: {
+							mainScene: {
+								type: "script",
+								path: "script/mainScene.js",
+								global: true
+							},
 							hoge: {
 								type: "image",
 								path: "image/hoge.png",
@@ -77,7 +82,13 @@ describe("Renamer", function () {
 			.then((gamejson) => {
 				Renamer.renameAssetFilenames(gamejson, "./srcDir");
 
-				expect(gamejson.main).toBe("script/04ef22b752657e08b66f.js");
+				expect(gamejson.main).toBe("./script/mainScene");
+				expect(gamejson.assets["mainScene"]).toEqual({
+					type: "script",
+					path: "script/04ef22b752657e08b66f.js",
+					virtualPath: "script/mainScene.js",
+					global: true
+				});
 				expect(gamejson.assets["hoge"]).toEqual({
 					type: "image",
 					path: "image/a70844aefe0a5ceb64eb.png",
