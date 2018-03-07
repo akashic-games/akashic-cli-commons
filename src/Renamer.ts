@@ -26,7 +26,6 @@ export function hashBasename(filepath: string, nameLength: number): string {
 export function renameAssetFilenames(content: GameConfiguration, basedir: string, maxHashLength: number = 20): void {
 	_renameAssets(content, basedir, maxHashLength);
 	_renameGlobalScripts(content, basedir, maxHashLength);
-	_renameModuleMainScripts(content, basedir, maxHashLength);
 }
 
 /**
@@ -91,13 +90,4 @@ function _renameGlobalScripts(content: GameConfiguration, basedir: string, maxHa
 		});
 	}
 	content.globalScripts = [];
-}
-
-function _renameModuleMainScripts(content: GameConfiguration, basedir: string, maxHashLength: number) {
-	if (content.moduleMainScripts) {
-		Object.keys(content.moduleMainScripts).forEach((name: string) => {
-			content.moduleMainScripts[name] = hashBasename(content.moduleMainScripts[name], maxHashLength);
-			// moduleMainScripts は globalScripts として登録されているためファイルのリネームはしない
-		});
-	}
 }

@@ -108,7 +108,8 @@ describe("Renamer", function () {
 					virtualPath: "node_modules/foo/bar/index.js",
 					global: true
 				});
-				expect(gamejson.moduleMainScripts["foo"]).toBe(Renamer.hashBasename("node_modules/foo/bar/index.js", 20));
+				// moduleMainScripts はvirtualPathで扱うのでリネームされていてはならない
+				expect(gamejson.moduleMainScripts["foo"]).toBe("node_modules/foo/bar/index.js");
 				expect(fs.statSync(path.join("srcDir", "image/a70844aefe0a5ceb64eb.png")).isFile()).toBe(true);
 				expect(fs.statSync(path.join("srcDir", "script/04ef22b752657e08b66f.js")).isFile()).toBe(true);
 				expect(fs.statSync(path.join("srcDir", "audio/47acba638f0bcfc681d7.mp4")).isFile()).toBe(true);
