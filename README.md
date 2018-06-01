@@ -4,7 +4,7 @@
 
 # akashic-cli-commons
 
-**akashic-cli-commons** は [Akashic Engine](https://akashic-games.github.io/) で使われる 各 akahsic-cli-xxx コマンドの共通ライブラリです。
+**akashic-cli-commons** は [Akashic Engine](https://akashic-games.github.io/) で使われる、各 akahsic-cli-xxx コマンドの共通ライブラリです。
 
 通常、ゲーム開発者がこのライブラリを直接利用する必要はありません。
 [akashic-cli](https://github.com/akashic-games/akashic-cli) を利用してください。
