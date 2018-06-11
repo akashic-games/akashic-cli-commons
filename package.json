@@ -4,8 +4,7 @@
   "description": "The shared definitions and routines for akashic-cli-xxx",
   "main": "lib/index.js",
   "scripts": {
-    "prepublish": "gulp clean && npm run install:typings && gulp compile",
-    "install:typings": "gulp install:typings",
+    "prepublish": "gulp clean && gulp compile",
     "clean:typings": "gulp clean:typings",
     "clean": "gulp clean",
     "build": "gulp compile",
@@ -20,6 +19,7 @@
     "package.json"
   ],
   "devDependencies": {
+    "@types/browserify": "^12.0.33",
     "@types/fs-extra": "5.0.2",
     "del": "~1.1.1",
     "gulp": "~3.9.1",

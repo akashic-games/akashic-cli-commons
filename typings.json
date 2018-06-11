@@ -1,9 +1,7 @@
 {
   "globalDependencies": {
-    "node": "github:DefinitelyTyped/DefinitelyTyped/node/node.d.ts#58aa81d0f90b118c7dc9e6ab685e4c7aa75f1c72",
-    "npm": "github:DefinitelyTyped/DefinitelyTyped/npm/index.d.ts#50387d40462301d54cda62e24d3b2ee46540f24a"
+
   },
   "dependencies": {
-    "browserify": "registry:dt/browserify#12.0.1+20160916155957"
   }
 }

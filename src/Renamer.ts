@@ -12,7 +12,6 @@ export const ERROR_FILENAME_CONFLICT = "ERROR_FILENAME_CONFLICT";
  * @param nameLength ファイル名の文字数の最大値
  */
 export function hashFilepath(filepath: string, nameLength: number): string {
-	const dirname = path.posix.dirname(filepath);
 	const hashedFilename = sha256(filepath).slice(0, nameLength);
 	const extname = path.extname(filepath);
 
@@ -21,7 +20,7 @@ export function hashFilepath(filepath: string, nameLength: number): string {
 	let hashedDirPath = "";
 	dirnames.forEach((dirname) => {
 		const hashedDirname = sha256(dirname).slice(0, dirname.length);
-		hashedDirPath = path.join(hashedDirPath, hashedDirname);;
+		hashedDirPath = path.join(hashedDirPath, hashedDirname);
 	});
 	return path.posix.join(hashedDirPath, hashedFilename + extname);
 }
