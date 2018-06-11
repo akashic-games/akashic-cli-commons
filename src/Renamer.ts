@@ -1,20 +1,29 @@
 import * as path from "path";
 import * as fs from "fs";
+import * as fsx from "fs-extra";
 import { sha256 } from "js-sha256";
 import { GameConfiguration } from "./GameConfiguration";
 
 export const ERROR_FILENAME_CONFLICT = "ERROR_FILENAME_CONFLICT";
 
 /**
- * 与えられたファイルパスのファイル名部分を、ファイルパスから計算したハッシュ値で置き換えたファイルパスを返す。
+ * 与えられたファイルパスのファイル名部分を、ファイルパスから計算したハッシュ値で置き換えたファイルパスを返す
  * @param filepath 変換するファイルパス
  * @param nameLength ファイル名の文字数の最大値
  */
-export function hashBasename(filepath: string, nameLength: number): string {
+export function hashFilepath(filepath: string, nameLength: number): string {
 	const dirname = path.posix.dirname(filepath);
 	const hashedFilename = sha256(filepath).slice(0, nameLength);
 	const extname = path.extname(filepath);
-	return path.posix.join(dirname, hashedFilename + extname);
+
+	// ディレクトリ名をハッシュ化
+	const dirnames = path.posix.dirname(filepath).split(path.posix.sep);
+	let hashedDirPath = "";
+	dirnames.forEach((dirname) => {
+		const hashedDirname = sha256(dirname).slice(0, dirname.length);
+		hashedDirPath = path.join(hashedDirPath, hashedDirname);;
+	});
+	return path.posix.join(hashedDirPath, hashedFilename + extname);
 }
 
 /**
@@ -39,6 +48,7 @@ function _renameFilename(basedir: string, filePath: string, newFilePath: string)
 		fs.accessSync(path.resolve(basedir, newFilePath));
 	} catch (error) {
 		if (error.code === "ENOENT") {
+			fsx.mkdirsSync(path.dirname(path.resolve(basedir, newFilePath)));
 			fs.renameSync(path.resolve(basedir, filePath), path.resolve(basedir, newFilePath));
 			return;
 		}
@@ -64,7 +74,7 @@ function _renameAssets(content: GameConfiguration, basedir: string, maxHashLengt
 	const assetNames = Object.keys(content.assets);
 	assetNames.forEach((name) => {
 		const filePath = content.assets[name].path;
-		const hashedFilePath = hashBasename(filePath, maxHashLength);
+		const hashedFilePath = hashFilepath(filePath, maxHashLength);
 		content.assets[name].path = hashedFilePath;
 		content.assets[name].virtualPath = filePath;
 		if (content.assets[name].type !== "audio") {
@@ -79,7 +89,7 @@ function _renameGlobalScripts(content: GameConfiguration, basedir: string, maxHa
 	if (content.globalScripts) {
 		content.globalScripts.forEach((name: string, idx: number) => {
 			const assetname = "a_e_z_" + idx;
-			const hashedFilePath = hashBasename(name, maxHashLength);
+			const hashedFilePath = hashFilepath(name, maxHashLength);
 			content.assets[assetname] = {
 				type: /\.json$/i.test(name) ? "text" : "script",
 				virtualPath: name,
