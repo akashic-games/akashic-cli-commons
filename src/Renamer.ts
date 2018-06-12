@@ -20,7 +20,7 @@ export function hashFilepath(filepath: string, nameLength: number): string {
 	let hashedDirPath = "";
 	dirnames.forEach((dirname) => {
 		const hashedDirname = sha256(dirname).slice(0, dirname.length);
-		hashedDirPath = path.join(hashedDirPath, hashedDirname);
+		hashedDirPath = path.posix.join(hashedDirPath, hashedDirname);
 	});
 	return path.posix.join(hashedDirPath, hashedFilename + extname);
 }
