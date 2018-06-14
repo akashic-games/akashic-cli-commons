@@ -11,7 +11,6 @@
 akashic-cli は Akashic Engine を使ったゲーム作成を補助するコマンドラインツールです。
 Akashic Engineの詳細な利用方法については、 [公式ページ](https://akashic-games.github.io/) を参照してください。
 
-
 ## ビルド方法
 
 **akashic-cli-commons** はTypeScriptで書かれたjsモジュールであるため、ビルドにはNode.jsが必要です。
