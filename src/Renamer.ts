@@ -15,14 +15,7 @@ export function hashFilepath(filepath: string, nameLength: number): string {
 	const hashedFilename = sha256(filepath).slice(0, nameLength);
 	const extname = path.extname(filepath);
 
-	// ディレクトリ名をハッシュ化
-	const dirnames = path.posix.dirname(filepath).split(path.posix.sep);
-	let hashedDirPath = "";
-	dirnames.forEach((dirname) => {
-		const hashedDirname = sha256(dirname).slice(0, dirname.length);
-		hashedDirPath = path.posix.join(hashedDirPath, hashedDirname);
-	});
-	return path.posix.join(hashedDirPath, hashedFilename + extname);
+	return path.posix.join("files", hashedFilename + extname);
 }
 
 /**
