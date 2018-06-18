@@ -5,7 +5,6 @@
   "main": "lib/index.js",
   "scripts": {
     "prepublish": "gulp clean && gulp compile",
-    "clean:typings": "gulp clean:typings",
     "clean": "gulp clean",
     "build": "gulp compile",
     "lint": "gulp lint lint-md",
@@ -34,8 +33,7 @@
     "mdast-lint": "~1.1.1",
     "mock-fs": "~4.2.0",
     "tslint": "~3.7.4",
-    "typescript": "~2.6.1",
-    "typings": "1.0.4"
+    "typescript": "~2.6.1"
   },
   "typings": "lib/index.d.ts",
   "dependencies": {

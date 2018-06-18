@@ -13,7 +13,7 @@ describe("Renamer", function () {
 			"21a027/04ef22b752657e08b66fe185c9f9592944afe6ab0ba51380f04d33f42d6a409c.js",
 			"dba27c31aad9/2c2/fcd/825a514c9ba0f7565c0bc4415451ee2350476c9c18abf970a98cdd62113617ce.js",
 			"6105d/a70844aefe0a5ceb64eb6b4ed23be19ab98eed26a43059802cd6a2b51e066e21.png"
-			]);
+		]);
 		expect(arr.map((v) => Renamer.hashFilepath(v, 5))).toEqual([
 			"21a027/04ef2.js",
 			"dba27c31aad9/2c2/fcd/825a5.js",
