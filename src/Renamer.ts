@@ -64,8 +64,10 @@ function _renameAudioFilename(basedir: string, filePath: string, newFilePath: st
 
 function _renameAssets(content: GameConfiguration, basedir: string, maxHashLength: number): void {
 	const assetNames = Object.keys(content.assets);
+	const assetDirs: string[] = [];
 	assetNames.forEach((name) => {
 		const filePath = content.assets[name].path;
+		assetDirs.push(path.dirname(filePath));
 		const hashedFilePath = hashFilepath(filePath, maxHashLength);
 		content.assets[name].path = hashedFilePath;
 		content.assets[name].virtualPath = filePath;
@@ -75,11 +77,33 @@ function _renameAssets(content: GameConfiguration, basedir: string, maxHashLengt
 			_renameAudioFilename(basedir, filePath, hashedFilePath);
 		}
 	});
+	// パス文字列長でソートすることで、空ディレクトリしかないツリーでも末端から削除できるようにする
+	assetDirs.sort((a, b) => {
+		if (a.length < b.length) return 1;
+		if (a.length > b.length) return -1;
+		return 0;
+	});
+	console.log("assetDirs", assetDirs);
+	assetDirs.forEach((dirpath) => {
+		const dirFullPath = path.resolve(basedir, dirpath);
+		try {
+			fs.accessSync(dirFullPath);
+			const files = fs.readdirSync(dirFullPath);
+			console.log(dirFullPath, ":", files);
+			if (files.length === 0) fs.rmdirSync(dirFullPath);
+		} catch (err) {
+			// do nothing
+		}
+	});
 }
 
 function _renameGlobalScripts(content: GameConfiguration, basedir: string, maxHashLength: number): void {
 	if (content.globalScripts) {
+		const assetDirs = fs.readdirSync(path.resolve(basedir, "node_modules")).map((filepath) => path.join("node_modules", filepath));
+		assetDirs.push("node_modules");
+
 		content.globalScripts.forEach((name: string, idx: number) => {
+			assetDirs.push(path.dirname(name));
 			const assetname = "a_e_z_" + idx;
 			const hashedFilePath = hashFilepath(name, maxHashLength);
 			content.assets[assetname] = {
@@ -89,6 +113,26 @@ function _renameGlobalScripts(content: GameConfiguration, basedir: string, maxHa
 				global: true
 			};
 			_renameFilename(basedir, name, hashedFilePath);
+		});
+		// パス文字列長でソートすることで、空ディレクトリしかないツリーでも末端から削除できるようにする
+		assetDirs.sort((a, b) => {
+			if (a.length < b.length) return 1;
+			if (a.length > b.length) return -1;
+			return 0;
+		});
+		console.log("assetDirs", assetDirs);
+		assetDirs.forEach((dirpath) => {
+			const dirFullPath = path.resolve(basedir, dirpath);
+			try {
+				fs.accessSync(dirFullPath);
+				const files = fs.readdirSync(dirFullPath);
+				console.log(dirFullPath, ":", files);
+				if (files.length === 0) fs.rmdirSync(dirFullPath);
+			} catch (err) {
+				// do nothing
+				console.log("dir", dirFullPath);
+				console.log("err", err);
+			}
 		});
 	}
 	content.globalScripts = [];
