@@ -83,16 +83,15 @@ function _renameAssets(content: GameConfiguration, basedir: string, maxHashLengt
 		if (a.length > b.length) return -1;
 		return 0;
 	});
-	console.log("assetDirs", assetDirs);
 	assetDirs.forEach((dirpath) => {
 		const dirFullPath = path.resolve(basedir, dirpath);
 		try {
 			fs.accessSync(dirFullPath);
 			const files = fs.readdirSync(dirFullPath);
-			console.log(dirFullPath, ":", files);
 			if (files.length === 0) fs.rmdirSync(dirFullPath);
-		} catch (err) {
-			// do nothing
+		} catch (error) {
+			if (error.code === "ENOENT") return;
+			throw error;
 		}
 	});
 }
@@ -120,18 +119,15 @@ function _renameGlobalScripts(content: GameConfiguration, basedir: string, maxHa
 			if (a.length > b.length) return -1;
 			return 0;
 		});
-		console.log("assetDirs", assetDirs);
 		assetDirs.forEach((dirpath) => {
 			const dirFullPath = path.resolve(basedir, dirpath);
 			try {
 				fs.accessSync(dirFullPath);
 				const files = fs.readdirSync(dirFullPath);
-				console.log(dirFullPath, ":", files);
 				if (files.length === 0) fs.rmdirSync(dirFullPath);
-			} catch (err) {
-				// do nothing
-				console.log("dir", dirFullPath);
-				console.log("err", err);
+			} catch (error) {
+				if (error.code === "ENOENT") return;
+				throw error;
 			}
 		});
 	}
