@@ -7,14 +7,13 @@ import { GameConfiguration } from "./GameConfiguration";
 export const ERROR_FILENAME_CONFLICT = "ERROR_FILENAME_CONFLICT";
 
 /**
- * 与えられたファイルパスのファイル名部分を、ファイルパスから計算したハッシュ値で置き換えたファイルパスを返す
+ * 与えられたファイルパスのファイル名部分を、ファイルパスから計算したハッシュ値で置き換え、 files/ 以下のファイルパスにして返す
  * @param filepath 変換するファイルパス
  * @param nameLength ファイル名の文字数の最大値
  */
 export function hashFilepath(filepath: string, nameLength: number): string {
 	const hashedFilename = sha256(filepath).slice(0, nameLength);
 	const extname = path.extname(filepath);
-
 	return path.posix.join("files", hashedFilename + extname);
 }
 
