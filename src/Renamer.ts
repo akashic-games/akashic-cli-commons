@@ -3,7 +3,6 @@ import * as fs from "fs";
 import * as fsx from "fs-extra";
 import { sha256 } from "js-sha256";
 import { GameConfiguration } from "./GameConfiguration";
-import { WSANOTINITIALISED } from "constants";
 
 export const ERROR_FILENAME_CONFLICT = "ERROR_FILENAME_CONFLICT";
 
