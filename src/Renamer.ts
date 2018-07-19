@@ -3,6 +3,7 @@ import * as fs from "fs";
 import * as fsx from "fs-extra";
 import { sha256 } from "js-sha256";
 import { GameConfiguration } from "./GameConfiguration";
+import { WSANOTINITIALISED } from "constants";
 
 export const ERROR_FILENAME_CONFLICT = "ERROR_FILENAME_CONFLICT";
 
@@ -77,13 +78,33 @@ function _renameAssets(content: GameConfiguration, basedir: string, maxHashLengt
 			_renameAudioFilename(basedir, filePath, hashedFilePath);
 		}
 	});
+	removeDirectoryIfEmpty(assetDirs, basedir);
+}
+
+function _renameGlobalScripts(content: GameConfiguration, basedir: string, maxHashLength: number): void {
+	if (content.globalScripts) {
+		content.globalScripts.forEach((name: string, idx: number) => {
+			const assetname = "a_e_z_" + idx;
+			const hashedFilePath = hashFilepath(name, maxHashLength);
+			content.assets[assetname] = {
+				type: /\.json$/i.test(name) ? "text" : "script",
+				virtualPath: name,
+				path: hashedFilePath,
+				global: true
+			};
+			_renameFilename(basedir, name, hashedFilePath);
+		});
+
+		const assetDirs = listDirNamesFromBasedir(content.globalScripts, basedir);
+		removeDirectoryIfEmpty(assetDirs, basedir);
+	}
+	content.globalScripts = [];
+}
+
+function removeDirectoryIfEmpty(dirnames: string[], basedir: string) {
 	// パス文字列長でソートすることで、空ディレクトリしかないツリーでも末端から削除できるようにする
-	assetDirs.sort((a, b) => {
-		if (a.length < b.length) return 1;
-		if (a.length > b.length) return -1;
-		return 0;
-	});
-	assetDirs.forEach((dirpath) => {
+	dirnames.sort((a, b) => (b.length - a.length));
+	dirnames.forEach((dirpath) => {
 		const dirFullPath = path.resolve(basedir, dirpath);
 		try {
 			fs.accessSync(dirFullPath);
@@ -96,40 +117,14 @@ function _renameAssets(content: GameConfiguration, basedir: string, maxHashLengt
 	});
 }
 
-function _renameGlobalScripts(content: GameConfiguration, basedir: string, maxHashLength: number): void {
-	if (content.globalScripts) {
-		const assetDirs = fs.readdirSync(path.resolve(basedir, "node_modules")).map((filepath) => path.join("node_modules", filepath));
-		assetDirs.push("node_modules");
-
-		content.globalScripts.forEach((name: string, idx: number) => {
-			assetDirs.push(path.dirname(name));
-			const assetname = "a_e_z_" + idx;
-			const hashedFilePath = hashFilepath(name, maxHashLength);
-			content.assets[assetname] = {
-				type: /\.json$/i.test(name) ? "text" : "script",
-				virtualPath: name,
-				path: hashedFilePath,
-				global: true
-			};
-			_renameFilename(basedir, name, hashedFilePath);
-		});
-		// パス文字列長でソートすることで、空ディレクトリしかないツリーでも末端から削除できるようにする
-		assetDirs.sort((a, b) => {
-			if (a.length < b.length) return 1;
-			if (a.length > b.length) return -1;
-			return 0;
-		});
-		assetDirs.forEach((dirpath) => {
-			const dirFullPath = path.resolve(basedir, dirpath);
-			try {
-				fs.accessSync(dirFullPath);
-				const files = fs.readdirSync(dirFullPath);
-				if (files.length === 0) fs.rmdirSync(dirFullPath);
-			} catch (error) {
-				if (error.code === "ENOENT") return;
-				throw error;
-			}
-		});
-	}
-	content.globalScripts = [];
+function listDirNamesFromBasedir(dirnames: string[], basedir: string): string[] {
+	const result: string[] = [];
+	dirnames.forEach((dirname) => {
+		let currentDir = path.normalize(dirname);
+		while (currentDir.indexOf(path.sep) !== -1) {
+			result.push(currentDir);
+			currentDir = path.dirname(currentDir);
+		}
+	});
+	return  Array.from(new Set(result));
 }
