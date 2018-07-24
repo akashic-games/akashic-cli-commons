@@ -94,7 +94,7 @@ function _renameGlobalScripts(content: GameConfiguration, basedir: string, maxHa
 			_renameFilename(basedir, name, hashedFilePath);
 		});
 
-		const assetDirs = listDirNamesFromBasedir(content.globalScripts, basedir);
+		const assetDirs = listAncestorDirNames(content.globalScripts);
 		removeDirectoryIfEmpty(assetDirs, basedir);
 	}
 	content.globalScripts = [];
@@ -105,23 +105,25 @@ function removeDirectoryIfEmpty(dirnames: string[], basedir: string) {
 	dirnames.sort((a, b) => (b.length - a.length));
 	dirnames.forEach((dirpath) => {
 		const dirFullPath = path.resolve(basedir, dirpath);
+		// if (/^\.\./.test(path.relative(basedir, dirFullPath))) return;
 		try {
 			fs.accessSync(dirFullPath);
 			const files = fs.readdirSync(dirFullPath);
 			if (files.length === 0) fs.rmdirSync(dirFullPath);
 		} catch (error) {
+			// if (["ENOENT", "EEXIST", "ENOTEMPTY"].indexOf(error.code) === -1) return;
 			if (error.code === "ENOENT") return;
 			throw error;
 		}
 	});
 }
 
-function listDirNamesFromBasedir(dirnames: string[], basedir: string): string[] {
-	const result: string[] = [];
+function listAncestorDirNames(dirnames: string[]): string[] {
+	const result: Set<string> = new Set();
 	dirnames.forEach((dirname) => {
 		let currentDir = path.normalize(dirname);
 		while (currentDir.indexOf(path.sep) !== -1) {
-			result.push(currentDir);
+			result.add(currentDir);
 			currentDir = path.dirname(currentDir);
 		}
 	});
