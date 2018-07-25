@@ -143,5 +143,12 @@ describe("Renamer", function () {
 			})
 			.catch(done.fail);
 		});
+
+		// srcDirより上のパスはコンテンツ外なので削除してはいけない
+		it("hash game.json - guard ancestor dirs", function (done) {
+			expect(() => {Renamer.removeDirectoryIfEmpty(["./hoge.png"], "./srcDir")}).not.toThrowError();
+			expect(() => {Renamer.removeDirectoryIfEmpty(["../ancestor/hoge.png"], "./srcDir")}).toThrow(new Error(Renamer.ERROR_PATH_INCLUDE_ANCESTOR));
+			done();
+		});
 	});
 });

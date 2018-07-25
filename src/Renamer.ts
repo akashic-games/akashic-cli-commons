@@ -5,6 +5,7 @@ import { sha256 } from "js-sha256";
 import { GameConfiguration } from "./GameConfiguration";
 
 export const ERROR_FILENAME_CONFLICT = "ERROR_FILENAME_CONFLICT";
+export const ERROR_PATH_INCLUDE_ANCESTOR = "ERROR_PATH_INCLUDE_ANCESTOR";
 
 /**
  * 与えられたファイルパスのファイル名部分を、ファイルパスから計算したハッシュ値で置き換えたファイルパスを返す
@@ -100,18 +101,18 @@ function _renameGlobalScripts(content: GameConfiguration, basedir: string, maxHa
 	content.globalScripts = [];
 }
 
-function removeDirectoryIfEmpty(dirnames: string[], basedir: string) {
+export function removeDirectoryIfEmpty(dirnames: string[], basedir: string) {
 	// パス文字列長でソートすることで、空ディレクトリしかないツリーでも末端から削除できるようにする
 	dirnames.sort((a, b) => (b.length - a.length));
 	dirnames.forEach((dirpath) => {
 		const dirFullPath = path.resolve(basedir, dirpath);
-		// if (/^\.\./.test(path.relative(basedir, dirFullPath))) return;
+		if (/^\.\./.test(path.relative(basedir, dirFullPath))) throw new Error(ERROR_PATH_INCLUDE_ANCESTOR);
 		try {
 			fs.accessSync(dirFullPath);
 			const files = fs.readdirSync(dirFullPath);
 			if (files.length === 0) fs.rmdirSync(dirFullPath);
 		} catch (error) {
-			// if (["ENOENT", "EEXIST", "ENOTEMPTY"].indexOf(error.code) === -1) return;
+			if (["ENOENT", "EEXIST", "ENOTEMPTY"].indexOf(error.code) === -1) return;
 			if (error.code === "ENOENT") return;
 			throw error;
 		}
