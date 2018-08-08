@@ -78,7 +78,8 @@ function _renameAssets(content: GameConfiguration, basedir: string, maxHashLengt
 			_renameAudioFilename(basedir, filePath, hashedFilePath);
 		}
 	});
-	removeDirectoryIfEmpty(assetDirs, basedir);
+	const assetAncestorDirs = _listAncestorDirNames(assetDirs.map((filepath) => path.dirname(filepath)));
+	_removeDirectoryIfEmpty(assetAncestorDirs, basedir);
 }
 
 function _renameGlobalScripts(content: GameConfiguration, basedir: string, maxHashLength: number): void {
@@ -95,13 +96,13 @@ function _renameGlobalScripts(content: GameConfiguration, basedir: string, maxHa
 			_renameFilename(basedir, name, hashedFilePath);
 		});
 
-		const assetDirs = listAncestorDirNames(content.globalScripts);
-		removeDirectoryIfEmpty(assetDirs, basedir);
+		const assetDirs = _listAncestorDirNames(content.globalScripts.map((filepath) => path.dirname(filepath)));
+		_removeDirectoryIfEmpty(assetDirs, basedir);
 	}
 	content.globalScripts = [];
 }
 
-export function removeDirectoryIfEmpty(dirnames: string[], basedir: string) {
+export function _removeDirectoryIfEmpty(dirnames: string[], basedir: string) {
 	// パス文字列長でソートすることで、空ディレクトリしかないツリーでも末端から削除できるようにする
 	dirnames.sort((a, b) => (b.length - a.length));
 	dirnames.forEach((dirpath) => {
@@ -109,17 +110,15 @@ export function removeDirectoryIfEmpty(dirnames: string[], basedir: string) {
 		if (/^\.\./.test(path.relative(basedir, dirFullPath))) throw new Error(ERROR_PATH_INCLUDE_ANCESTOR);
 		try {
 			fs.accessSync(dirFullPath);
-			const files = fs.readdirSync(dirFullPath);
-			if (files.length === 0) fs.rmdirSync(dirFullPath);
+			fs.rmdirSync(dirFullPath);
 		} catch (error) {
-			if (["ENOENT", "EEXIST", "ENOTEMPTY"].indexOf(error.code) === -1) return;
-			if (error.code === "ENOENT") return;
+			if (["ENOENT", "EEXIST", "ENOTEMPTY"].indexOf(error.code) !== -1) return;
 			throw error;
 		}
 	});
 }
 
-function listAncestorDirNames(dirnames: string[]): string[] {
+export function _listAncestorDirNames(dirnames: string[]): string[] {
 	const result: Set<string> = new Set();
 	dirnames.forEach((dirname) => {
 		let currentDir = path.normalize(dirname);

@@ -143,11 +143,75 @@ describe("Renamer", function () {
 			})
 			.catch(done.fail);
 		});
+	});
 
-		// srcDirより上のパスはコンテンツ外なので削除してはいけない
-		it("hash game.json - guard ancestor dirs", function (done) {
-			expect(() => {Renamer.removeDirectoryIfEmpty(["./hoge.png"], "./srcDir")}).not.toThrowError();
-			expect(() => {Renamer.removeDirectoryIfEmpty(["../ancestor/hoge.png"], "./srcDir")}).toThrow(new Error(Renamer.ERROR_PATH_INCLUDE_ANCESTOR));
+	describe("_removeDirectoryIfEmpty()", function () {
+		var content = {
+			main: "./script/a/b/c.js",
+			assets: {
+				c: {
+					type: "script",
+					path: "script/a/b/c.js",
+					global: true
+				},
+				e: {
+					type: "script",
+					path: "script/d/e.js",
+					global: true
+				}
+			},
+		};
+		beforeEach(function () {
+			mockfs({
+				srcDir: {
+					"game.json": JSON.stringify(content),
+					script: {
+						a: {
+							b: {
+								"c.js": ""
+							}
+						},
+						d: {
+							"e.js": ""
+						}
+					}
+				},
+				destDir: {}
+			});
+		});
+		afterEach(function () {
+			mockfs.restore();
+		});
+		it("delete empty dirs", function (done) {
+			Renamer.renameAssetFilenames(JSON.parse(JSON.stringify(content)), "./srcDir", 20);
+			var ancestors = Renamer._listAncestorDirNames(["./srcDir/script/a/b/c.js", "./srcDir/script/d/e.js"]);
+			ancestors.forEach((ancestor) => {
+				try {
+					fs.statSync(ancestor);
+				} catch (error) {
+					expect(error.code).toBe("ENOENT");
+				}
+			});
+			done();
+		});
+
+		if("not sorted dirnames", function (done) {
+			var ancestors = Renamer._listAncestorDirNames(["./srcDir/script/a/b/c.js", "./srcDir/script/d/e.js"]).reverse();
+			Renamer._removeDirectoryIfEmpty(ancestors);
+			ancestors.forEach((ancestor) => {
+				try {
+					fs.statSync(ancestor);
+				} catch (error) {
+					expect(error.code).toBe("ENOENT");
+				}
+			});
+			done();
+		});
+
+		it("save file included dirs", function (done) {
+			fs.writeFileSync("./srcDir/script/a/b/c2.js", "hello");
+			Renamer.renameAssetFilenames(JSON.parse(JSON.stringify(content)), "./srcDir", 20);
+			expect(fs.statSync("./srcDir/script/a/b/c2.js").isFile()).toBe(true);
 			done();
 		});
 	});
