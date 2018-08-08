@@ -118,6 +118,9 @@ export function _removeDirectoryIfEmpty(dirnames: string[], basedir: string) {
 	});
 }
 
+/**
+ * 相対パスを受け取り、そのパス内で表現されているもっとも祖先にあたるディレクトリまでの各祖先ディレクトリをリストで返す
+ */
 export function _listAncestorDirNames(dirnames: string[]): string[] {
 	const result: Set<string> = new Set();
 	dirnames.forEach((dirname) => {
