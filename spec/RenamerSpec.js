@@ -208,6 +208,19 @@ describe("Renamer", function () {
 			done();
 		});
 
+		if("include ancenstor path", function (done) {
+			var ancestors = Renamer._listAncestorDirNames(["../otherAncenstorsrcDir/script/a/b/c.js"]).reverse();
+			Renamer._removeDirectoryIfEmpty(ancestors);
+			ancestors.forEach((ancestor) => {
+				try {
+					fs.statSync(ancestor);
+				} catch (error) {
+					expect(error.code).toBe("ENOENT");
+				}
+			});
+			done();
+		});
+
 		it("save file included dirs", function (done) {
 			fs.writeFileSync("./srcDir/script/a/b/c2.js", "hello");
 			Renamer.renameAssetFilenames(JSON.parse(JSON.stringify(content)), "./srcDir", 20);
