@@ -9,6 +9,7 @@
   },
   "files": [
     "./node_modules/typescript/lib/lib.es6.d.ts",
+    "./node_modules/@types/eslint/index.d.ts",
     "./typings/index.d.ts",
     "./typings/extend.npm.d.ts",
     "./typings/fs-readdir-recursive.d.ts",

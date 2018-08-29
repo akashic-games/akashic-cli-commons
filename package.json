@@ -20,6 +20,7 @@
     "package.json"
   ],
   "devDependencies": {
+    "@types/eslint": "4.16.3",
     "del": "~1.1.1",
     "gulp": "~3.9.1",
     "gulp-istanbul": "~0.10.4",
@@ -33,14 +34,16 @@
     "mdast-lint": "~1.1.1",
     "mock-fs": "~4.2.0",
     "tslint": "~3.7.4",
-    "typescript": "^1.7.5",
+    "typescript": "^2.2.2",
     "typings": "1.0.4"
   },
   "typings": "lib/index.d.ts",
   "dependencies": {
     "browserify": "10.2.4",
+    "eslint": "^5.4.0",
     "fs-readdir-recursive": "0.1.2",
-    "js-sha256": "^0.8.0"
+    "js-sha256": "^0.8.0",
+    "shelljs": "^0.8.2"
   },
   "repository": {
     "type": "git",
