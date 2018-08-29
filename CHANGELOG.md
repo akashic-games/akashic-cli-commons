@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## Unreleased changes
+* 対象のコードがes5構文に沿っているかを判定する関数の追加
+
 ## 0.2.9
 * `Renamer` がgame.jsonの `moduleMainScripts` のファイル名をハッシュ化してしまう問題を修正
 
