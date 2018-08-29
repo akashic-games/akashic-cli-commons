@@ -42,8 +42,7 @@
     "browserify": "10.2.4",
     "eslint": "^5.4.0",
     "fs-readdir-recursive": "0.1.2",
-    "js-sha256": "^0.8.0",
-    "shelljs": "^0.8.2"
+    "js-sha256": "^0.8.0"
   },
   "repository": {
     "type": "git",
