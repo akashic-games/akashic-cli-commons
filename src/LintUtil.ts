@@ -1,6 +1,12 @@
 import * as eslint from "eslint";
 
-export function validateEs5Code(code: string): boolean {
+export interface LintErrorInfo {
+	column: number;
+	line: number;
+	message: string;
+}
+
+export function validateEs5Code(code: string): LintErrorInfo[] {
 	const errors = (new eslint.Linter()).verify(code, {
 		env: {
 			"browser": true
@@ -9,5 +15,11 @@ export function validateEs5Code(code: string): boolean {
 			ecmaVersion: 5
 		}
 	});
-	return errors.length === 0;
+	return errors.map(error => {
+		return {
+			column: error.column,
+			line: error.line,
+			message: error.message
+		};
+	});
 }
