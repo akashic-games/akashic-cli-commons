@@ -8,9 +8,6 @@ export interface LintErrorInfo {
 
 export function validateEs5Code(code: string): LintErrorInfo[] {
 	const errors = (new eslint.Linter()).verify(code, {
-		env: {
-			"browser": true
-		},
 		parserOptions: {
 			ecmaVersion: 5
 		}
