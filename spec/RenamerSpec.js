@@ -20,7 +20,7 @@ describe("Renamer", function () {
 			"files/a7084.png"
 		]);
 	});
-
+/*
 	describe(".hashFilePaths()", function () {
 		beforeEach(function () {
 			mockfs({
@@ -144,8 +144,7 @@ describe("Renamer", function () {
 			.catch(done.fail);
 		});
 	});
-
-	describe("_removeDirectoryIfEmpty()", function () {
+	describe("renameAssetFilenames()", function () {
 		var content = {
 			main: "./script/a/b/c.js",
 			assets: {
@@ -182,49 +181,144 @@ describe("Renamer", function () {
 		afterEach(function () {
 			mockfs.restore();
 		});
-		it("delete empty dirs", function (done) {
-			Renamer.renameAssetFilenames(JSON.parse(JSON.stringify(content)), "./srcDir", 20);
-			var ancestors = Renamer._listAncestorDirNames(["./srcDir/script/a/b/c.js", "./srcDir/script/d/e.js"]);
-			ancestors.forEach((ancestor) => {
-				try {
-					fs.statSync(ancestor);
-				} catch (error) {
-					expect(error.code).toBe("ENOENT");
-				}
-			});
-			done();
-		});
-
-		if("not sorted dirnames", function (done) {
-			var ancestors = Renamer._listAncestorDirNames(["./srcDir/script/a/b/c.js", "./srcDir/script/d/e.js"]).reverse();
-			Renamer._removeDirectoryIfEmpty(ancestors);
-			ancestors.forEach((ancestor) => {
-				try {
-					fs.statSync(ancestor);
-				} catch (error) {
-					expect(error.code).toBe("ENOENT");
-				}
-			});
-			done();
-		});
-
-		if("include ancenstor path", function (done) {
-			var ancestors = Renamer._listAncestorDirNames(["../otherAncenstorsrcDir/script/a/b/c.js"]).reverse();
-			Renamer._removeDirectoryIfEmpty(ancestors);
-			ancestors.forEach((ancestor) => {
-				try {
-					fs.statSync(ancestor);
-				} catch (error) {
-					expect(error.code).toBe("ENOENT");
-				}
-			});
-			done();
-		});
-
 		it("save file included dirs", function (done) {
 			fs.writeFileSync("./srcDir/script/a/b/c2.js", "hello");
 			Renamer.renameAssetFilenames(JSON.parse(JSON.stringify(content)), "./srcDir", 20);
 			expect(fs.statSync("./srcDir/script/a/b/c2.js").isFile()).toBe(true);
+			done();
+		});
+	});
+
+	describe("_removeDirectoryIfEmpty()", function () {
+		var content = {
+			main: "./script/a/b/c.js",
+			assets: {
+				c: {
+					type: "script",
+					path: "script/a/b/c.js",
+					global: true
+				},
+				e: {
+					type: "script",
+					path: "script/d/e.js",
+					global: true
+				}
+			},
+		};
+		beforeEach(function () {
+			mockfs({
+				srcDir: {
+					"game.json": JSON.stringify(content),
+					script: {
+						a: {
+							b: {
+							}
+						},
+						d: {
+						}
+					}
+				},
+				destDir: {}
+			});
+		});
+		afterEach(function () {
+			mockfs.restore();
+		});
+		it("delete empty dirs", function (done) {
+			// ファイルへのパスが含まれるケースは想定しない
+			var ancestors = [
+				'srcDir/script/a/b',
+				'srcDir/script/a',
+				'srcDir/script',
+				'srcDir/script/d'
+			];
+			Renamer._removeDirectoryIfEmpty(ancestors, "./");
+			ancestors.forEach((ancestor) => {
+				try {
+					fs.statSync(ancestor);
+					done.fail();
+				} catch (error) {
+					expect(error.code).toBe("ENOENT");
+					done();
+				}
+			});
+		});
+
+		it("not sorted dirnames", function (done) {
+			// パス長さ順にソートされていないパスを渡した場合
+			var ancestors = [
+				'srcDir/script/d',
+				'srcDir/script',
+				'srcDir/script/a',
+				'srcDir/script/a/b',
+			];
+			Renamer._removeDirectoryIfEmpty(ancestors, "./");
+			ancestors.forEach((ancestor) => {
+				try {
+					fs.statSync(ancestor);
+					done.fail();
+				} catch (error) {
+					expect(error.code).toBe("ENOENT");
+					done();
+				}
+			});
+		});
+
+		it("include ancenstor path", function (done) {
+			var ancestors = [
+				'../otherAncenstorsrcDir/script/d',
+				'../otherAncenstorsrcDir/script',
+				'../otherAncenstorsrcDir/script/a',
+				'../otherAncenstorsrcDir/script/a/b',
+			];
+			try {
+				Renamer._removeDirectoryIfEmpty(ancestors, "./");
+				done.fail();
+			} catch (error) {
+				expect(error.message).toBe("ERROR_PATH_INCLUDE_ANCESTOR");
+				done();
+			}
+		});
+	});
+	*/
+
+	describe("_listAncestorDirNames()", function () {
+		it("return ancestor paths", function (done) {
+			var ancestors = Renamer._listAncestorDirNames(["./srcDir/script/a/b/c.js"]).sort((a, b) => (b.length - a.length));
+			expect(ancestors).toEqual([
+				'./srcDir/script/a/b/c.js',
+				'./srcDir/script/a/b',
+				'./srcDir/script/a',
+				'./srcDir/script',
+				'./srcDir'
+			].map((ancestorPath) => path.normalize(ancestorPath)));
+			done();
+		});
+
+		it("2 paths", function (done) {
+			var ancestors = Renamer._listAncestorDirNames(["./srcDir/script/a/b/c.js", "./srcDir/script/d/e/f.js"]).sort((a, b) => (b.length - a.length));
+			expect(ancestors).toEqual([
+				'./srcDir/script/a/b/c.js',
+				'./srcDir/script/d/e/f.js',
+				'./srcDir/script/a/b',
+				'./srcDir/script/d/e',
+				'./srcDir/script/a',
+				'./srcDir/script/d',
+				'./srcDir/script',
+				'./srcDir'
+			].map((ancestorPath) => path.normalize(ancestorPath)));
+			done();
+		});
+
+		it("include ancenstor path", function (done) {
+			var ancestors = Renamer._listAncestorDirNames(["../otherAncenstorsrcDir/script/a/b/c.js"]).sort((a, b) => (b.length - a.length));
+			expect(ancestors).toEqual([
+				'../otherAncenstorsrcDir/script/a/b/c.js',
+				'../otherAncenstorsrcDir/script/a/b',
+				'../otherAncenstorsrcDir/script/a',
+				'../otherAncenstorsrcDir/script',
+				'../otherAncenstorsrcDir'
+			].map((ancestorPath) => path.normalize(ancestorPath)));
 			done();
 		});
 	});

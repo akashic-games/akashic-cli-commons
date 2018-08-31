@@ -65,10 +65,10 @@ function _renameAudioFilename(basedir: string, filePath: string, newFilePath: st
 
 function _renameAssets(content: GameConfiguration, basedir: string, maxHashLength: number): void {
 	const assetNames = Object.keys(content.assets);
-	const assetDirs: string[] = [];
+	const dirpaths: string[] = [];
 	assetNames.forEach((name) => {
 		const filePath = content.assets[name].path;
-		assetDirs.push(path.dirname(filePath));
+		dirpaths.push(path.dirname(filePath));
 		const hashedFilePath = hashFilepath(filePath, maxHashLength);
 		content.assets[name].path = hashedFilePath;
 		content.assets[name].virtualPath = filePath;
@@ -78,7 +78,7 @@ function _renameAssets(content: GameConfiguration, basedir: string, maxHashLengt
 			_renameAudioFilename(basedir, filePath, hashedFilePath);
 		}
 	});
-	const assetAncestorDirs = _listAncestorDirNames(assetDirs.map((filepath) => path.dirname(filepath)));
+	const assetAncestorDirs = _listAncestorDirNames(dirpaths);
 	_removeDirectoryIfEmpty(assetAncestorDirs, basedir);
 }
 
@@ -102,10 +102,10 @@ function _renameGlobalScripts(content: GameConfiguration, basedir: string, maxHa
 	content.globalScripts = [];
 }
 
-export function _removeDirectoryIfEmpty(dirnames: string[], basedir: string) {
+export function _removeDirectoryIfEmpty(dirpaths: string[], basedir: string) {
 	// パス文字列長でソートすることで、空ディレクトリしかないツリーでも末端から削除できるようにする
-	dirnames.sort((a, b) => (b.length - a.length));
-	dirnames.forEach((dirpath) => {
+	dirpaths.sort((a, b) => (b.length - a.length));
+	dirpaths.forEach((dirpath) => {
 		const dirFullPath = path.resolve(basedir, dirpath);
 		if (/^\.\./.test(path.relative(basedir, dirFullPath))) throw new Error(ERROR_PATH_INCLUDE_ANCESTOR);
 		try {
@@ -119,16 +119,20 @@ export function _removeDirectoryIfEmpty(dirnames: string[], basedir: string) {
 }
 
 /**
- * 相対パスを受け取り、そのパス内で表現されているもっとも祖先にあたるディレクトリまでの各祖先ディレクトリをリストで返す
+ * ディレクトリの相対パスを受け取り、そのパス内で表現されているもっとも祖先にあたるディレクトリまでの各祖先ディレクトリをリストで返す
  */
-export function _listAncestorDirNames(dirnames: string[]): string[] {
+export function _listAncestorDirNames(dirpaths: string[]): string[] {
+	console.log("_listAncestorDirNames", dirpaths)
 	const result: Set<string> = new Set();
-	dirnames.forEach((dirname) => {
-		let currentDir = path.normalize(dirname);
+	dirpaths.forEach((dirpath) => {
+		let currentDir = path.normalize(dirpath);
 		while (currentDir.indexOf(path.sep) !== -1) {
 			result.add(currentDir);
 			currentDir = path.dirname(currentDir);
 		}
+		// path.normalizeによって `./` が消えるためwhile中で拾えないrootパスをaddする
+		if (currentDir !== "..") result.add(currentDir);
 	});
+	console.log("result", Array.from(new Set(result)));
 	return  Array.from(new Set(result));
 }
