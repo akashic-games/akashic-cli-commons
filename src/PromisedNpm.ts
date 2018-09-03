@@ -70,14 +70,14 @@ export class PromisedNpm {
 	ls(silent: boolean = false): Promise<NpmLsResultObject> {
 		return new Promise<NpmLsResultObject>((resolve, reject) => {
 			this._logger.info("Listing dependencies ...");
-			exec("npm ls --json --production" + (silent ? " --silent" : ""), (err: any, stdout: string, stderr: string) => {
+			exec("npm ls --json --production" + (silent ? " --silent" : ""), (err: any, stdout: Buffer, stderr: Buffer) => {
 				if (err) {
-					if (stderr.indexOf("extraneous") !== -1) {
+					if (stderr.toString().indexOf("extraneous") !== -1) {
 						this._logger.error("Extraneous module found in node_modules. You must install modules using akashic-cli.");
 					}
 					return reject(err);
 				}
-				const result = JSON.parse(stdout); // npmから返るstdoutは必ずJSON形式。エラーがある場合はerrとstderrで返される。
+				const result = JSON.parse(stdout.toString()); // npmから返るstdoutは必ずJSON形式。エラーがある場合はerrとstderrで返される。
 				resolve(result);
 			});
 		});
