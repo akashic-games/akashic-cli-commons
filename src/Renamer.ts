@@ -122,7 +122,6 @@ export function _removeDirectoryIfEmpty(dirpaths: string[], basedir: string) {
  * ディレクトリの相対パスを受け取り、そのパス内で表現されているもっとも祖先にあたるディレクトリまでの各祖先ディレクトリをリストで返す
  */
 export function _listAncestorDirNames(dirpaths: string[]): string[] {
-	console.log("_listAncestorDirNames", dirpaths)
 	const result: Set<string> = new Set();
 	dirpaths.forEach((dirpath) => {
 		let currentDir = path.normalize(dirpath);
@@ -133,6 +132,5 @@ export function _listAncestorDirNames(dirpaths: string[]): string[] {
 		// path.normalizeによって `./` が消えるためwhile中で拾えないrootパスをaddする
 		if (currentDir !== "..") result.add(currentDir);
 	});
-	console.log("result", Array.from(new Set(result)));
 	return  Array.from(new Set(result));
 }

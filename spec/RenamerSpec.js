@@ -20,7 +20,7 @@ describe("Renamer", function () {
 			"files/a7084.png"
 		]);
 	});
-/*
+
 	describe(".hashFilePaths()", function () {
 		beforeEach(function () {
 			mockfs({
@@ -280,7 +280,6 @@ describe("Renamer", function () {
 			}
 		});
 	});
-	*/
 
 	describe("_listAncestorDirNames()", function () {
 		it("return ancestor paths", function (done) {
