@@ -295,14 +295,19 @@ describe("Renamer", function () {
 		});
 
 		it("2 paths", function (done) {
-			var ancestors = Renamer._listAncestorDirNames(["./srcDir/script/a/b/c.js", "./srcDir/script/d/e/f.js"]).sort((a, b) => (b.length - a.length));
+			var ancestors = Renamer._listAncestorDirNames(["./srcDir/script/a/b/c.js", "./srcDir/script/d/e/f.js"])
+				.sort((a, b) => {
+					if (b.length !== a.length) return b.length - a.length;
+					if (b[b.length - 1].toString() < a[a.length - 1].toString()) return -1;
+					return 1;
+				});
 			expect(ancestors).toEqual([
-				'./srcDir/script/a/b/c.js',
 				'./srcDir/script/d/e/f.js',
-				'./srcDir/script/a/b',
+				'./srcDir/script/a/b/c.js',
 				'./srcDir/script/d/e',
-				'./srcDir/script/a',
+				'./srcDir/script/a/b',
 				'./srcDir/script/d',
+				'./srcDir/script/a',
 				'./srcDir/script',
 				'./srcDir'
 			].map((ancestorPath) => path.normalize(ancestorPath)));
