@@ -1,6 +1,6 @@
 {
   "name": "@akashic/akashic-cli-commons",
-  "version": "0.2.10",
+  "version": "0.2.11",
   "description": "The shared definitions and routines for akashic-cli-xxx",
   "main": "lib/index.js",
   "scripts": {
@@ -31,7 +31,7 @@
     "jasmine-terminal-reporter": "~0.9.1",
     "mdast": "~2.0.0",
     "mdast-lint": "~1.1.1",
-    "mock-fs": "~4.2.0",
+    "mock-fs": "~4.5.0",
     "tslint": "~3.7.4",
     "typescript": "~2.6.1"
   },
@@ -47,6 +47,6 @@
     "url": "https://github.com/akashic-games/akashic-cli-commons.git"
   },
   "publishConfig": {
-    "@akashic:registry": "http://registry.npmjs.org/"
+    "@akashic:registry": "https://registry.npmjs.org/"
   }
 }

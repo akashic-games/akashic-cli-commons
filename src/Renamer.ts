@@ -5,6 +5,7 @@ import { sha256 } from "js-sha256";
 import { GameConfiguration } from "./GameConfiguration";
 
 export const ERROR_FILENAME_CONFLICT = "ERROR_FILENAME_CONFLICT";
+export const ERROR_PATH_INCLUDE_ANCESTOR = "ERROR_PATH_INCLUDE_ANCESTOR";
 
 /**
  * 与えられたファイルパスのファイル名部分を、ファイルパスから計算したハッシュ値で置き換え、 files/ 以下のファイルパスにして返す
@@ -63,8 +64,10 @@ function _renameAudioFilename(basedir: string, filePath: string, newFilePath: st
 
 function _renameAssets(content: GameConfiguration, basedir: string, maxHashLength: number): void {
 	const assetNames = Object.keys(content.assets);
+	const dirpaths: string[] = [];
 	assetNames.forEach((name) => {
 		const filePath = content.assets[name].path;
+		dirpaths.push(path.dirname(filePath));
 		const hashedFilePath = hashFilepath(filePath, maxHashLength);
 		content.assets[name].path = hashedFilePath;
 		content.assets[name].virtualPath = filePath;
@@ -74,6 +77,8 @@ function _renameAssets(content: GameConfiguration, basedir: string, maxHashLengt
 			_renameAudioFilename(basedir, filePath, hashedFilePath);
 		}
 	});
+	const assetAncestorDirs = _listAncestorDirNames(dirpaths);
+	_removeDirectoryIfEmpty(assetAncestorDirs, basedir);
 }
 
 function _renameGlobalScripts(content: GameConfiguration, basedir: string, maxHashLength: number): void {
@@ -89,6 +94,42 @@ function _renameGlobalScripts(content: GameConfiguration, basedir: string, maxHa
 			};
 			_renameFilename(basedir, name, hashedFilePath);
 		});
+
+		const assetDirs = _listAncestorDirNames(content.globalScripts.map((filepath) => path.dirname(filepath)));
+		_removeDirectoryIfEmpty(assetDirs, basedir);
 	}
 	content.globalScripts = [];
+}
+
+export function _removeDirectoryIfEmpty(dirpaths: string[], basedir: string) {
+	// パス文字列長でソートすることで、空ディレクトリしかないツリーでも末端から削除できるようにする
+	dirpaths.sort((a, b) => (b.length - a.length));
+	dirpaths.forEach((dirpath) => {
+		const dirFullPath = path.resolve(basedir, dirpath);
+		if (/^\.\./.test(path.relative(basedir, dirFullPath))) throw new Error(ERROR_PATH_INCLUDE_ANCESTOR);
+		try {
+			fs.accessSync(dirFullPath);
+			fs.rmdirSync(dirFullPath);
+		} catch (error) {
+			if (["ENOENT", "EEXIST", "ENOTEMPTY"].indexOf(error.code) !== -1) return;
+			throw error;
+		}
+	});
+}
+
+/**
+ * ディレクトリの相対パスを受け取り、そのパス内で表現されているもっとも祖先にあたるディレクトリまでの各祖先ディレクトリをリストで返す
+ */
+export function _listAncestorDirNames(dirpaths: string[]): string[] {
+	const result: Set<string> = new Set();
+	dirpaths.forEach((dirpath) => {
+		let currentDir = path.normalize(dirpath);
+		while (currentDir.indexOf(path.sep) !== -1) {
+			result.add(currentDir);
+			currentDir = path.dirname(currentDir);
+		}
+		// path.normalizeによって `./` が消えるためwhile中で拾えないrootパスをaddする
+		if (currentDir !== "..") result.add(currentDir);
+	});
+	return  Array.from(new Set(result));
 }
