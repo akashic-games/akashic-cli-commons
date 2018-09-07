@@ -1,7 +1,7 @@
 # CHANGELOG
 
 ## 0.2.10
-* `Renamer` がハッシュ化した後、空のディレクトリが残る問題を修正
+* `Renamer` のハッシュ化でディレクトリもハッシュ化する
 
 ## 0.2.9
 * `Renamer` がgame.jsonの `moduleMainScripts` のファイル名をハッシュ化してしまう問題を修正
