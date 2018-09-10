@@ -24,7 +24,7 @@ export class Configuration {
 	vacuumGlobalScripts(): void {
 		this._content.globalScripts = this._content.globalScripts.filter((filePath) => {
 			try {
-				fs.accessSync(filePath, fs.F_OK);
+				fs.accessSync(filePath, fs.constants.F_OK);
 			} catch (err) {
 				if (err.code === "ENOENT") {
 					return false;
