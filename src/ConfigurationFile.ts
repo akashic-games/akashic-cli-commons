@@ -40,7 +40,7 @@ export module ConfigurationFile {
 	export function write(content: GameConfiguration, confPath: string, logger: Logger): Promise<void> {
 		return new Promise<void>((resolve: () => void, reject: (err: any) => void) => {
 			var text = JSON.stringify(content, null, "\t");
-			fs.writeFile(confPath, text, "utf8", (err: any) => {
+			fs.writeFile(confPath, text, {encoding: "utf8"}, (err: any) => {
 				if (err) {
 					reject(err);
 				} else {

@@ -19,3 +19,5 @@ import * as Util from "./Util";
 export { Util };
 import * as Renamer from "./Renamer";
 export { Renamer };
+import * as LintUtil from "./LintUtil";
+export { LintUtil };
