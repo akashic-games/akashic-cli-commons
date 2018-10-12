@@ -43,7 +43,7 @@ export function makeUnixPath(path: string): string {
 export function chdir(dirpath: string): (err?: any) => Promise<void> {
 	var cwd = process.cwd();
 	process.chdir(dirpath);
-	return function (err?: any) {
+	return function (err?: any): Promise<void> {
 		process.chdir(cwd);
 		return err ? Promise.reject(err) : Promise.resolve();
 	};
@@ -68,4 +68,4 @@ export function mkdirpSync(p: string): void {
 				throw e;
 		}
 	}
-};
+}

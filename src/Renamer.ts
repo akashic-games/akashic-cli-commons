@@ -101,7 +101,7 @@ function _renameGlobalScripts(content: GameConfiguration, basedir: string, maxHa
 	content.globalScripts = [];
 }
 
-export function _removeDirectoryIfEmpty(dirpaths: string[], basedir: string) {
+export function _removeDirectoryIfEmpty(dirpaths: string[], basedir: string): void {
 	// パス文字列長でソートすることで、空ディレクトリしかないツリーでも末端から削除できるようにする
 	dirpaths.sort((a, b) => (b.length - a.length));
 	dirpaths.forEach((dirpath) => {
