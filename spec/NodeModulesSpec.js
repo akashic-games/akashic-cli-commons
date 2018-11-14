@@ -139,7 +139,7 @@ describe("NodeModules", function () {
 	// モジュール名に node_modules を含むモジュールに依存しているケース
 	describe(".listPackageJsonsFromScriptsPath() with failure-prone module name", function () {
 		it("list the files named package.json", function (done) {
-			mockFsContent = {
+			var mockFsContent2 = {
 				"node_modules": {
 					"@dummy": {
 						"dummy_node_modules": {
@@ -191,7 +191,7 @@ describe("NodeModules", function () {
 					}
 				}
 			};
-			mockfs(mockFsContent);
+			mockfs(mockFsContent2);
 			Promise.resolve()
 				.then(() => NodeModules.listScriptFiles(".", ["@dummy/dummy_node_modules", "dummy_node_modules"]))
 				.then((filePaths) => NodeModules.listPackageJsonsFromScriptsPath(".", filePaths))
