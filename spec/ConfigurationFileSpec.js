@@ -42,7 +42,8 @@ describe("ConfigurationFile", function () {
 		it("rejects directory", function (done) {
 			Promise.resolve()
 				.then(() => ConfigurationFile.read("./dirname", logger))
-				.then(done.fail, done);
+				.then(done.fail)
+				.catch((e) => done());
 		});
 		it("creates empty data unless the file exists", function (done) {
 			Promise.resolve()
@@ -56,7 +57,8 @@ describe("ConfigurationFile", function () {
 		it("rejects invalid JSON", function (done) {
 			Promise.resolve()
 				.then(() => ConfigurationFile.read("./invalid-json.json", logger))
-				.then(done.fail, done);
+				.then(done.fail)
+				.catch((e) => done());
 		});
 	});
 
@@ -74,7 +76,8 @@ describe("ConfigurationFile", function () {
 		it("rejects writing to directory", function (done) {
 			Promise.resolve()
 				.then(() => ConfigurationFile.write({}, "./dirname", logger))
-				.then(done.fail, done);
+				.then(done.fail)
+				.catch((e) => done());
 		});
 	});
 });
