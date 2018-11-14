@@ -139,6 +139,7 @@ describe("NodeModules", function () {
 	// モジュール名に node_modules を含むモジュールに依存しているケース
 	describe(".listPackageJsonsFromScriptsPath() with failure-prone module name", function () {
 		it("list the files named package.json", function (done) {
+			// このテストではmockFsContentの中身を変えるので、mockFsContentは使い回せない。使い回した場合タイミングによりエラーとなる。
 			var mockFsContent2 = {
 				"node_modules": {
 					"@dummy": {
