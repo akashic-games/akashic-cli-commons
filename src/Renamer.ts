@@ -92,7 +92,6 @@ function isRenamed(content: GameConfiguration, hashedFilePath: string) {
 	});
 	if (paths.indexOf(hashedFilePath) !== -1) return true; // 重複あり
 	return false;
-
 }
 
 function _renameGlobalScripts(content: GameConfiguration, basedir: string, maxHashLength: number): void {

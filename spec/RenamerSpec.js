@@ -120,6 +120,45 @@ describe("Renamer", function () {
 			.catch(done.fail)
 		});
 
+		// アセットの path が重複している場合、重複するアセットでハッシュ化後のファイルを共有する
+		it("hash game.json - throw error", function (done) {
+			Promise.resolve()
+			.then(() => ConfigurationFile.ConfigurationFile.read(path.join("./srcDir", "game.json"), undefined))
+			.then((gamejson) => {
+				gamejson.assets = {
+					hoge: {
+						type: "image",
+						path: "image/hoge.png",
+						global: true
+					},
+					hoge2: {
+						type: "image",
+						path: "image/hoge.png",
+						global: true
+					}
+				};
+				gamejson.globalScripts = [];
+				expect(() => {
+					Renamer.renameAssetFilenames(gamejson, "./srcDir");
+					expect(fs.statSync(path.join("srcDir", "files/04ef22b752657e08b66f.js")).isFile()).toBe(true);
+					expect(gamejson.assets["hoge"]).toEqual({
+						type: "image",
+						path: "files/a70844aefe0a5ceb64eb.png",
+						virtualPath: "image/hoge.png",
+						global: true
+					});
+					expect(gamejson.assets["hoge2"]).toEqual({
+						type: "image",
+						path: "files/a70844aefe0a5ceb64eb.png",
+						virtualPath: "image/hoge.png",
+						global: true
+					});
+
+				});
+				done();
+			})
+			.catch(done.fail);
+		});
 	});
 	describe("renameAssetFilenames()", function () {
 		var content = {
