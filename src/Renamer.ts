@@ -69,8 +69,11 @@ function _renameAssets(content: GameConfiguration, basedir: string, maxHashLengt
 		const filePath = content.assets[name].path;
 		dirpaths.push(path.dirname(filePath));
 		const hashedFilePath = hashFilepath(filePath, maxHashLength);
+		const isRenamedAsset = isRenamed(content, hashedFilePath);
+
 		content.assets[name].path = hashedFilePath;
 		content.assets[name].virtualPath = filePath;
+		if (isRenamedAsset) return; // 同じパスのアセットを既にハッシュ化済みの場合、ファイルはリネーム済み
 		if (content.assets[name].type !== "audio") {
 			_renameFilename(basedir, filePath, hashedFilePath);
 		} else {
@@ -81,17 +84,30 @@ function _renameAssets(content: GameConfiguration, basedir: string, maxHashLengt
 	_removeDirectoryIfEmpty(assetAncestorDirs, basedir);
 }
 
+function isRenamed(content: GameConfiguration, hashedFilePath: string) {
+	const paths: string[] = [];
+	const assetNames = Object.keys(content.assets);
+	assetNames.forEach((name) => {
+		paths.push(content.assets[name].path);
+	});
+	if (paths.indexOf(hashedFilePath) !== -1) return true; // 重複あり
+	return false;
+
+}
+
 function _renameGlobalScripts(content: GameConfiguration, basedir: string, maxHashLength: number): void {
 	if (content.globalScripts) {
 		content.globalScripts.forEach((name: string, idx: number) => {
 			const assetname = "a_e_z_" + idx;
 			const hashedFilePath = hashFilepath(name, maxHashLength);
+			const isRenamedAsset = isRenamed(content, hashedFilePath);
 			content.assets[assetname] = {
 				type: /\.json$/i.test(name) ? "text" : "script",
 				virtualPath: name,
 				path: hashedFilePath,
 				global: true
 			};
+			if (isRenamedAsset) return; // 同じパスのアセットを既にハッシュ化済みの場合、ファイルはリネーム済み
 			_renameFilename(basedir, name, hashedFilePath);
 		});
 
