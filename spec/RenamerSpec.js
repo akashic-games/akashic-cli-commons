@@ -120,29 +120,6 @@ describe("Renamer", function () {
 			.catch(done.fail)
 		});
 
-		// アセットの path が重複している場合、ファイル名の衝突が発生しエラーになる
-		it("hash game.json - throw error", function (done) {
-			Promise.resolve()
-			.then(() => ConfigurationFile.ConfigurationFile.read(path.join("./srcDir", "game.json"), undefined))
-			.then((gamejson) => {
-				gamejson.assets = {
-					hoge: {
-						type: "image",
-						path: "image/hoge.png",
-						global: true
-					},
-					hoge2: {
-						type: "image",
-						path: "image/hoge.png",
-						global: true
-					}
-				};
-				gamejson.globalScripts = [];
-				expect(() => {Renamer.renameAssetFilenames(gamejson, "./srcDir")}).toThrow(new Error(Renamer.ERROR_FILENAME_CONFLICT));
-				done();
-			})
-			.catch(done.fail);
-		});
 	});
 	describe("renameAssetFilenames()", function () {
 		var content = {
