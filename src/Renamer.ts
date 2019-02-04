@@ -86,16 +86,6 @@ function _renameAssets(content: GameConfiguration, basedir: string, maxHashLengt
 	_removeDirectoryIfEmpty(assetAncestorDirs, basedir);
 }
 
-function isRenamed(content: GameConfiguration, hashedFilePath: string) {
-	const paths: string[] = [];
-	const assetNames = Object.keys(content.assets);
-	assetNames.forEach((name) => {
-		paths.push(content.assets[name].path);
-	});
-	if (paths.indexOf(hashedFilePath) !== -1) return true; // 重複あり
-	return false;
-}
-
 function _renameGlobalScripts(content: GameConfiguration, processedAssetPaths: Set<string>, basedir: string, maxHashLength: number): void {
 	if (content.globalScripts) {
 		content.globalScripts.forEach((name: string, idx: number) => {
