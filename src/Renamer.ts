@@ -101,13 +101,15 @@ function _renameGlobalScripts(content: GameConfiguration, processedAssetPaths: S
 		content.globalScripts.forEach((name: string, idx: number) => {
 			const assetname = "a_e_z_" + idx;
 			const hashedFilePath = hashFilepath(name, maxHashLength);
-			const isRenamedAsset = isRenamed(content, hashedFilePath);
+			const isRenamedAsset = processedAssetPaths.has(hashedFilePath);
+
 			content.assets[assetname] = {
 				type: /\.json$/i.test(name) ? "text" : "script",
 				virtualPath: name,
 				path: hashedFilePath,
 				global: true
 			};
+			processedAssetPaths.add(hashedFilePath);
 			if (isRenamedAsset) return; // 同じパスのアセットを既にハッシュ化済みの場合、ファイルはリネーム済み
 			_renameFilename(basedir, name, hashedFilePath, processedAssetPaths);
 		});
